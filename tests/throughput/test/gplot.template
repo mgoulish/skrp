@@ -1,0 +1,17 @@
+set title "Throughput"
+
+set   autoscale
+unset key
+
+set xlabel "seconds"
+
+set ylabel "Gbits/sec"
+
+set yrange [ 0 : MAX_VAL ]
+
+
+set terminal jpeg size 1000, 500
+set output "OUTPUT_IMAGE"
+
+plot "DATA_FILE" with linespoints lt rgb "red" lw 2
+

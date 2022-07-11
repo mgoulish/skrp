@@ -1,0 +1,33 @@
+#! /bin/bash
+
+if [ $# -eq 0 ]
+then
+    echo "Provide run name as arg"
+    exit 1
+fi
+
+run=$1
+echo "Processing run ${run}"
+input_file=../runs/${run}/iperf_send
+
+DATA_DIR=../runs/${run}/data
+RESULT_DIR=../runs/${run}/result
+
+data_file=${DATA_DIR}/iperf_send.data
+result_image=${RESULT_DIR}/throughput.jpg
+
+rm -rf ${DATA_DIR} ${RESULT_DIR}
+mkdir  ${DATA_DIR} ${RESULT_DIR}
+
+cat ${input_file} | grep "Gbits/sec" | head --lines=-2 | tr "-" " " | tr "[" " " | tr "]" " " | awk '{print $2 " " $7}' > ${data_file}
+max_val=`cat ${data_file} | awk '{print $2}' | sort -n | tail -1`
+
+sed "s|DATA_FILE|${data_file}|"       < ./gplot.template  > ./1.temp
+sed "s|MAX_VAL|${max_val}|"           < ./1.temp          > ./2.temp
+sed "s|OUTPUT_IMAGE|${result_image}|" < ./2.temp          > ./gplot
+
+rm *.temp
+
+gnuplot ./gplot
+display ${result_image}
+
