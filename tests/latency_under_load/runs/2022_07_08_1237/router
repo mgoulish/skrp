@@ -1,0 +1,132 @@
+2022-07-08 12:37:21.508616 -0400 SERVER (info) Container Name: A
+2022-07-08 12:37:21.508699 -0400 ROUTER (info) Router started in Interior mode, area=0 id=A
+2022-07-08 12:37:21.508703 -0400 ROUTER (info) Version: 2.0.1-64-gb88f0464
+2022-07-08 12:37:21.508853 -0400 ROUTER_CORE (info) Core module present but disabled: edge_router
+2022-07-08 12:37:21.508859 -0400 ROUTER_CORE (info) Core module present but disabled: core_test_hooks
+2022-07-08 12:37:21.508869 -0400 ROUTER_CORE (info) Core module enabled: edge_addr_tracking
+2022-07-08 12:37:21.508872 -0400 ROUTER_CORE (info) Core module enabled: address_lookup_client
+2022-07-08 12:37:21.508875 -0400 ROUTER_CORE (info) Core module present but disabled: heartbeat_edge
+2022-07-08 12:37:21.508885 -0400 ROUTER_CORE (info) Core module enabled: heartbeat_server
+2022-07-08 12:37:21.508888 -0400 ROUTER_CORE (info) Stuck delivery detection: Scan interval: 30 seconds, Delivery age threshold: 10 seconds
+2022-07-08 12:37:21.508891 -0400 ROUTER_CORE (info) Core module enabled: stuck_delivery_detection
+2022-07-08 12:37:21.508932 -0400 ROUTER_CORE (info) Core module enabled: mobile_sync
+2022-07-08 12:37:21.508936 -0400 ROUTER_CORE (info) Streaming link scrubber: Scan interval: 30 seconds, max free pool: 128 links
+2022-07-08 12:37:21.508939 -0400 ROUTER_CORE (info) Core module enabled: streaming_link_scrubber
+2022-07-08 12:37:21.509033 -0400 ROUTER_CORE (info) Protocol adaptor registered: http/1.x
+2022-07-08 12:37:21.509056 -0400 ROUTER_CORE (info) Protocol adaptor registered: http2
+2022-07-08 12:37:21.509086 -0400 FLOW_LOG (info) Protocol logging started
+2022-07-08 12:37:21.509130 -0400 ROUTER_CORE (info) Protocol adaptor registered: tcp
+2022-07-08 12:37:21.509164 -0400 ROUTER_CORE (info) Protocol adaptor registered: amqp
+2022-07-08 12:37:21.509246 -0400 ROUTER_CORE (info) Router Core thread running. 0/A
+2022-07-08 12:37:21.509292 -0400 ROUTER_CORE (info) In-process subscription L/qdrouter.ma
+2022-07-08 12:37:21.509318 -0400 ROUTER_CORE (info) In-process subscription T/qdrouter.ma
+2022-07-08 12:37:21.509327 -0400 ROUTER_CORE (info) In-process subscription M/$management
+2022-07-08 12:37:21.509387 -0400 ROUTER_CORE (info) In-process subscription L/$management
+2022-07-08 12:37:21.509395 -0400 ROUTER_CORE (info) In-process subscription L/qdrouter
+2022-07-08 12:37:21.509405 -0400 ROUTER_CORE (info) In-process subscription T/qdrouter
+2022-07-08 12:37:21.509414 -0400 ROUTER_CORE (info) In-process subscription L/qdhello
+2022-07-08 12:37:21.509424 -0400 ROUTER (info) Router Engine Instantiated: id=A instance=1657298241 max_routers=128
+2022-07-08 12:37:21.514415 -0400 AGENT (info) Activating management agent on $_management_internal
+2022-07-08 12:37:21.514457 -0400 ROUTER_CORE (info) In-process subscription L/$_management_internal
+2022-07-08 12:37:21.514898 -0400 POLICY (info) Policy configured maxConnections: 65535, policyDir: '',access rules enabled: 'false', use hostname patterns: 'false'
+2022-07-08 12:37:21.515237 -0400 POLICY (info) Policy fallback defaultVhost is defined: '$default'
+2022-07-08 12:37:21.515426 -0400 TCP_ADAPTOR (info) Configured TcpListener for addr-1, 0.0.0.0:5801
+2022-07-08 12:37:21.515726 -0400 TCP_ADAPTOR (info) Configured TcpListener for addr-2, 0.0.0.0:5803
+2022-07-08 12:37:21.516014 -0400 TCP_ADAPTOR (info) Configured TcpConnector for addr-1, 127.0.0.1:5802
+2022-07-08 12:37:21.516049 -0400 TCP_ADAPTOR (info) [C1] Opening server-side core connection egress-dispatch
+2022-07-08 12:37:21.516117 -0400 ROUTER_CORE (info) [C1] Connection Opened: dir=out host=egress-dispatch encrypted=no auth=no user= container_id=TcpAdaptor props={:"qd.adaptor"="tcp"}
+2022-07-08 12:37:21.516201 -0400 ROUTER_CORE (info) [C1][L1] Link attached: dir=out source={addr-1 expire:link} target={<none> expire:link}
+2022-07-08 12:37:21.516431 -0400 TCP_ADAPTOR (info) Configured TcpConnector for addr-2, 127.0.0.1:5804
+2022-07-08 12:37:21.516442 -0400 TCP_ADAPTOR (info) [C2] Opening server-side core connection egress-dispatch
+2022-07-08 12:37:21.516452 -0400 ROUTER_CORE (info) [C2] Connection Opened: dir=out host=egress-dispatch encrypted=no auth=no user= container_id=TcpAdaptor props={:"qd.adaptor"="tcp"}
+2022-07-08 12:37:21.516484 -0400 ROUTER_CORE (info) [C2][L2] Link attached: dir=out source={addr-2 expire:link} target={<none> expire:link}
+2022-07-08 12:37:21.516614 -0400 SERVER (notice) Operational, 12 Threads Running (process ID 24017)
+2022-07-08 12:37:21.516695 -0400 SERVER (notice) Process VmSize 400.28 MiB (251.45 GiB available memory)
+2022-07-08 12:37:21.517165 -0400 TCP_ADAPTOR (notice) PN_LISTENER_OPEN Listening on 0.0.0.0:5801
+2022-07-08 12:37:21.517202 -0400 TCP_ADAPTOR (notice) PN_LISTENER_OPEN Listening on 0.0.0.0:5803
+2022-07-08 12:37:23.508976 -0400 FLOW_LOG (info) ROUTER [0:IfqLY:0] BEGIN hostname=Brontonomicon name=0/A buildVersion=2.0.1-64-gb88f0464
+2022-07-08 12:37:27.467363 -0400 TCP_ADAPTOR (info) PN_LISTENER_ACCEPT Accepting TCP connection to 0.0.0.0:5801
+2022-07-08 12:37:27.467872 -0400 ROUTER_CORE (info) [C3] Connection Opened: dir=in host=127.0.0.1:58488 encrypted=no auth=no user= container_id=TcpAdaptor props={:"qd.adaptor"="tcp"}
+2022-07-08 12:37:27.468038 -0400 TCP_ADAPTOR (info) [C3] PN_RAW_CONNECTION_CONNECTED Listener ingress accepted to 0.0.0.0:5801 from 127.0.0.1:58488 (global_id=127.0.0.1:58488@my-site)
+2022-07-08 12:37:27.468050 -0400 ROUTER_CORE (info) [C3][L3] Link attached: dir=out source={(dyn)<none> expire:link} target={<none> expire:link}
+2022-07-08 12:37:27.468080 -0400 ROUTER_CORE (info) [C3][L4] Link attached: dir=in source={<none> expire:link} target={addr-1 expire:link}
+2022-07-08 12:37:27.468636 -0400 TCP_ADAPTOR (info) [C4] call pn_proactor_raw_connect(). Egress connecting to: 127.0.0.1:5802
+2022-07-08 12:37:27.468899 -0400 TCP_ADAPTOR (info) [C4] PN_RAW_CONNECTION_CONNECTED Connector egress connected to 127.0.0.1:5802
+2022-07-08 12:37:27.468913 -0400 TCP_ADAPTOR (info) [C4] Opening server-side core connection 127.0.0.1:5802
+2022-07-08 12:37:27.468996 -0400 ROUTER_CORE (info) [C4] Connection Opened: dir=out host=127.0.0.1:5802 encrypted=no auth=no user= container_id=TcpAdaptor props={:"qd.adaptor"="tcp"}
+2022-07-08 12:37:27.469052 -0400 ROUTER_CORE (info) [C4][L5] Link attached: dir=out source={addr-1 expire:link} target={<none> expire:link}
+2022-07-08 12:37:27.469126 -0400 ROUTER_CORE (info) [C4][L6] Link attached: dir=in source={<none> expire:link} target={amqp:/_topo/0/A/temp.1GpFZ1RjMK994+T expire:link}
+2022-07-08 12:37:27.469785 -0400 TCP_ADAPTOR (info) PN_LISTENER_ACCEPT Accepting TCP connection to 0.0.0.0:5801
+2022-07-08 12:37:27.469831 -0400 ROUTER_CORE (info) [C5] Connection Opened: dir=in host=127.0.0.1:58504 encrypted=no auth=no user= container_id=TcpAdaptor props={:"qd.adaptor"="tcp"}
+2022-07-08 12:37:27.469853 -0400 TCP_ADAPTOR (info) [C5] PN_RAW_CONNECTION_CONNECTED Listener ingress accepted to 0.0.0.0:5801 from 127.0.0.1:58504 (global_id=127.0.0.1:58504@my-site)
+2022-07-08 12:37:27.469864 -0400 ROUTER_CORE (info) [C5][L7] Link attached: dir=out source={(dyn)<none> expire:link} target={<none> expire:link}
+2022-07-08 12:37:27.469895 -0400 ROUTER_CORE (info) [C5][L8] Link attached: dir=in source={<none> expire:link} target={addr-1 expire:link}
+2022-07-08 12:37:27.470085 -0400 TCP_ADAPTOR (info) [C6] call pn_proactor_raw_connect(). Egress connecting to: 127.0.0.1:5802
+2022-07-08 12:37:27.470235 -0400 TCP_ADAPTOR (info) [C6] PN_RAW_CONNECTION_CONNECTED Connector egress connected to 127.0.0.1:5802
+2022-07-08 12:37:27.470258 -0400 TCP_ADAPTOR (info) [C6] Opening server-side core connection 127.0.0.1:5802
+2022-07-08 12:37:27.470280 -0400 ROUTER_CORE (info) [C6] Connection Opened: dir=out host=127.0.0.1:5802 encrypted=no auth=no user= container_id=TcpAdaptor props={:"qd.adaptor"="tcp"}
+2022-07-08 12:37:27.470298 -0400 ROUTER_CORE (info) [C6][L9] Link attached: dir=out source={addr-1 expire:link} target={<none> expire:link}
+2022-07-08 12:37:27.470353 -0400 ROUTER_CORE (info) [C6][L10] Link attached: dir=in source={<none> expire:link} target={amqp:/_topo/0/A/temp.FYJ815l2Gpw7hGR expire:link}
+2022-07-08 12:37:27.510402 -0400 FLOW_LOG (info) LISTENER [0:IfqLY:1] BEGIN parent=0:IfqLY:0 destHost=0.0.0.0 protocol=tcp destPort=5801 vanAddress=addr-1 name=tcpListener/0.0.0.0:5801
+2022-07-08 12:37:27.510440 -0400 FLOW_LOG (info) CONNECTOR [0:IfqLY:3] BEGIN parent=0:IfqLY:0 destHost=127.0.0.1 protocol=tcp destPort=5802 vanAddress=addr-1 name=tcpConnector/127.0.0.1:5802
+2022-07-08 12:37:37.066746 -0400 TCP_ADAPTOR (info) PN_LISTENER_ACCEPT Accepting TCP connection to 0.0.0.0:5803
+2022-07-08 12:37:37.066881 -0400 ROUTER_CORE (info) [C7] Connection Opened: dir=in host=127.0.0.1:38582 encrypted=no auth=no user= container_id=TcpAdaptor props={:"qd.adaptor"="tcp"}
+2022-07-08 12:37:37.066920 -0400 TCP_ADAPTOR (info) [C7] PN_RAW_CONNECTION_CONNECTED Listener ingress accepted to 0.0.0.0:5803 from 127.0.0.1:38582 (global_id=127.0.0.1:38582@my-site)
+2022-07-08 12:37:37.066941 -0400 ROUTER_CORE (info) [C7][L11] Link attached: dir=out source={(dyn)<none> expire:link} target={<none> expire:link}
+2022-07-08 12:37:37.067361 -0400 ROUTER_CORE (info) [C7][L12] Link attached: dir=in source={<none> expire:link} target={addr-2 expire:link}
+2022-07-08 12:37:37.067424 -0400 TCP_ADAPTOR (info) [C8] call pn_proactor_raw_connect(). Egress connecting to: 127.0.0.1:5804
+2022-07-08 12:37:37.067535 -0400 TCP_ADAPTOR (info) [C8] PN_RAW_CONNECTION_CONNECTED Connector egress connected to 127.0.0.1:5804
+2022-07-08 12:37:37.067544 -0400 TCP_ADAPTOR (info) [C8] Opening server-side core connection 127.0.0.1:5804
+2022-07-08 12:37:37.067594 -0400 ROUTER_CORE (info) [C8] Connection Opened: dir=out host=127.0.0.1:5804 encrypted=no auth=no user= container_id=TcpAdaptor props={:"qd.adaptor"="tcp"}
+2022-07-08 12:37:37.067662 -0400 ROUTER_CORE (info) [C8][L13] Link attached: dir=out source={addr-2 expire:link} target={<none> expire:link}
+2022-07-08 12:37:37.067720 -0400 ROUTER_CORE (info) [C8][L14] Link attached: dir=in source={<none> expire:link} target={amqp:/_topo/0/A/temp.3XsVwPzNICD2UNg expire:link}
+2022-07-08 12:37:37.111807 -0400 FLOW_LOG (info) LISTENER [0:IfqLY:2] BEGIN parent=0:IfqLY:0 destHost=0.0.0.0 protocol=tcp destPort=5803 vanAddress=addr-2 name=tcpListener/0.0.0.0:5803
+2022-07-08 12:37:37.111955 -0400 FLOW_LOG (info) CONNECTOR [0:IfqLY:4] BEGIN parent=0:IfqLY:0 destHost=127.0.0.1 protocol=tcp destPort=5804 vanAddress=addr-2 name=tcpConnector/127.0.0.1:5804
+2022-07-08 13:37:27.471324 -0400 TCP_ADAPTOR (info) [C6] PN_RAW_CONNECTION_DISCONNECTED connector
+2022-07-08 13:37:27.471586 -0400 TCP_ADAPTOR (info) [C5] EOS
+2022-07-08 13:37:27.471694 -0400 ROUTER_CORE (info) [C6][L10] Link lost: del=1 presett=1 psdrop=0 acc=0 rej=0 rel=0 mod=0 delay1=0 delay10=1 blocked=no
+2022-07-08 13:37:27.471724 -0400 TCP_ADAPTOR (info) [C5] PN_RAW_CONNECTION_DISCONNECTED listener
+2022-07-08 13:37:27.471737 -0400 ROUTER_CORE (info) [C6][L9] Link lost: del=0 presett=0 psdrop=0 acc=0 rej=0 rel=0 mod=1 delay1=0 delay10=1 blocked=no
+2022-07-08 13:37:27.471752 -0400 ROUTER_CORE (info) [C6] Connection Closed
+2022-07-08 13:37:27.471777 -0400 ROUTER_CORE (info) [C5][L8] Link lost: del=1 presett=1 psdrop=0 acc=0 rej=0 rel=0 mod=0 delay1=0 delay10=1 blocked=no
+2022-07-08 13:37:27.471786 -0400 ROUTER_CORE (info) [C5][L7] Link lost: del=1 presett=1 psdrop=0 acc=0 rej=0 rel=0 mod=0 delay1=0 delay10=1 blocked=no
+2022-07-08 13:37:27.471795 -0400 ROUTER_CORE (info) [C5] Connection Closed
+2022-07-08 13:37:27.471824 -0400 TCP_ADAPTOR (info) [C4] EOS
+2022-07-08 13:37:27.472022 -0400 TCP_ADAPTOR (info) [C4] PN_RAW_CONNECTION_DISCONNECTED connector
+2022-07-08 13:37:27.472045 -0400 ROUTER_CORE (info) [C4][L6] Link lost: del=1 presett=1 psdrop=0 acc=0 rej=0 rel=0 mod=0 delay1=0 delay10=1 blocked=no
+2022-07-08 13:37:27.472057 -0400 ROUTER_CORE (info) [C4][L5] Link lost: del=1 presett=1 psdrop=0 acc=0 rej=0 rel=0 mod=0 delay1=0 delay10=1 blocked=no
+2022-07-08 13:37:27.472065 -0400 ROUTER_CORE (info) [C4] Connection Closed
+2022-07-08 13:37:27.472094 -0400 TCP_ADAPTOR (info) [C3] EOS
+2022-07-08 13:37:27.472136 -0400 TCP_ADAPTOR (info) [C3] PN_RAW_CONNECTION_DISCONNECTED listener
+2022-07-08 13:37:27.472183 -0400 ROUTER_CORE (info) [C3][L4] Link lost: del=1 presett=1 psdrop=0 acc=0 rej=0 rel=0 mod=0 delay1=0 delay10=1 blocked=no
+2022-07-08 13:37:27.472208 -0400 ROUTER_CORE (info) [C3][L3] Link lost: del=1 presett=1 psdrop=0 acc=0 rej=0 rel=0 mod=0 delay1=0 delay10=1 blocked=no
+2022-07-08 13:37:27.472216 -0400 ROUTER_CORE (info) [C3] Connection Closed
+2022-07-08 13:37:27.600932 -0400 FLOW_LOG (info) FLOW [0:IfqLY:7] BEGIN END parent=0:IfqLY:1 sourceHost=127.0.0.1 sourcePort=58504 octets=2419026264101 latency=467
+2022-07-08 13:37:27.600991 -0400 FLOW_LOG (info) FLOW [0:IfqLY:5] BEGIN END parent=0:IfqLY:1 sourceHost=127.0.0.1 sourcePort=58488 octets=446 latency=1022
+2022-07-08 13:37:27.601003 -0400 FLOW_LOG (info) FLOW [0:IfqLY:6] BEGIN END parent=0:IfqLY:3 counterflow=0:IfqLY:5 sourceHost=127.0.0.1 sourcePort=52328 octets=305 latency=458 trace=Local
+2022-07-08 13:37:27.601012 -0400 FLOW_LOG (info) FLOW [0:IfqLY:8] BEGIN END parent=0:IfqLY:3 counterflow=0:IfqLY:7 sourceHost=127.0.0.1 sourcePort=52340 octets=0 latency=265 trace=Local
+2022-07-08 13:37:42.858597 -0400 TCP_ADAPTOR (info) [C7] PN_RAW_CONNECTION_DISCONNECTED listener
+2022-07-08 13:37:42.858639 -0400 ROUTER_CORE (info) [C7][L12] Link lost: del=1 presett=1 psdrop=0 acc=0 rej=0 rel=0 mod=0 delay1=0 delay10=1 blocked=no
+2022-07-08 13:37:42.858667 -0400 ROUTER_CORE (info) [C7][L11] Link lost: del=0 presett=0 psdrop=0 acc=0 rej=0 rel=0 mod=1 delay1=0 delay10=1 blocked=no
+2022-07-08 13:37:42.858676 -0400 ROUTER_CORE (info) [C7] Connection Closed
+2022-07-08 13:37:42.858762 -0400 TCP_ADAPTOR (info) [C8] EOS
+2022-07-08 13:37:42.858833 -0400 TCP_ADAPTOR (info) [C8] PN_RAW_CONNECTION_DISCONNECTED connector
+2022-07-08 13:37:42.858864 -0400 ROUTER_CORE (info) [C8][L14] Link lost: del=1 presett=1 psdrop=0 acc=0 rej=0 rel=0 mod=0 delay1=0 delay10=1 blocked=no
+2022-07-08 13:37:42.858889 -0400 ROUTER_CORE (info) [C8][L13] Link lost: del=1 presett=1 psdrop=0 acc=0 rej=0 rel=0 mod=0 delay1=0 delay10=1 blocked=no
+2022-07-08 13:37:42.858898 -0400 ROUTER_CORE (info) [C8] Connection Closed
+2022-07-08 13:37:43.004094 -0400 FLOW_LOG (info) FLOW [0:IfqLY:9] BEGIN END parent=0:IfqLY:2 sourceHost=127.0.0.1 sourcePort=38582 octets=2771140200 latency=442
+2022-07-08 13:37:43.004123 -0400 FLOW_LOG (info) FLOW [0:IfqLY:10] BEGIN END parent=0:IfqLY:4 counterflow=0:IfqLY:9 sourceHost=127.0.0.1 sourcePort=54880 octets=2771140200 latency=357 trace=Local
+2022-07-08 13:37:44.073869 -0400 SERVER (notice) Shut Down
+2022-07-08 13:37:44.084040 -0400 ROUTER_CORE (info) Router Core thread exited
+2022-07-08 13:37:44.084159 -0400 TCP_ADAPTOR (info) Shutting down TCP protocol adaptor
+2022-07-08 13:37:44.084206 -0400 TCP_ADAPTOR (info) Deleted TCP adaptor configuration 'tcpListener/0.0.0.0:5801' for address addr-1, 0.0.0.0:5801, siteId my-site.
+2022-07-08 13:37:44.084215 -0400 TCP_ADAPTOR (info) Deleted TCP adaptor configuration 'tcpListener/0.0.0.0:5803' for address addr-2, 0.0.0.0:5803, siteId my-site.
+2022-07-08 13:37:44.084223 -0400 TCP_ADAPTOR (info) Deleted TCP adaptor configuration 'tcpConnector/127.0.0.1:5802' for address addr-1, 127.0.0.1:5802, siteId my-site.
+2022-07-08 13:37:44.084229 -0400 TCP_ADAPTOR (info) Deleted TCP adaptor configuration 'tcpConnector/127.0.0.1:5804' for address addr-2, 127.0.0.1:5804, siteId my-site.
+2022-07-08 13:37:44.084280 -0400 FLOW_LOG (info) Protocol logging completed
+2022-07-08 13:37:44.084401 -0400 ROUTER_CORE (info) Finalizing core module: streaming_link_scrubber
+2022-07-08 13:37:44.084414 -0400 ROUTER_CORE (info) Finalizing core module: mobile_sync
+2022-07-08 13:37:44.084421 -0400 ROUTER_CORE (info) Finalizing core module: stuck_delivery_detection
+2022-07-08 13:37:44.084426 -0400 ROUTER_CORE (info) Finalizing core module: heartbeat_server
+2022-07-08 13:37:44.084431 -0400 ROUTER_CORE (info) Finalizing core module: address_lookup_client
+2022-07-08 13:37:44.084436 -0400 ROUTER_CORE (info) Finalizing core module: edge_addr_tracking

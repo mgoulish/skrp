@@ -1,0 +1,90 @@
+#! /bin/bash
+
+if [ $# -eq 0 ]
+then
+    echo "Provide run name as arg"
+    exit 1
+fi
+
+run=$1
+echo "Processing run ${run}"
+input_file=../runs/${run}/sockperf_send
+
+DATA_DIR=../runs/${run}/data
+RESULT_DIR=../runs/${run}/result
+
+rm -rf ${DATA_DIR} ${RESULT_DIR}
+mkdir  ${DATA_DIR} ${RESULT_DIR}
+
+#----------------------------------------------------------------
+# This array associates X positions on the final result graph
+# with the percentiles they represent.
+# I can't use the percentiles themselves as the X positions
+# because then the last few would be right next to each other.
+#----------------------------------------------------------------
+declare -A x_to_percentile=(
+ [10]="25"
+ [20]="50"
+ [30]="75"
+ [40]="90"
+ [50]="99.000"
+ [60]="99.900"
+ [70]="99.990"
+ [80]="99.999"
+)
+
+#-------------------------------------------------------------
+# Now use the keys and the values from "x_to_percentile" 
+# to grep out the 'score' for that percentile. I.e. the 
+# number of microseconds at that percentile.
+# I.e. if the percentile is 90 and its 'score' is 125,
+# that means that 90% of all messages took 125 microseconds
+# or less to arrive.
+#-------------------------------------------------------------
+
+
+# These are the positions at which data 
+# will be plotted on the X axis.
+x_positions=(10 20 30 40 50 60 70 80)
+
+#---------------------------------------------------------
+# For each x-position, find which percentile goes there,
+# grep out the result for that percentile from the input 
+# file (which was produced by sockperf) and store it in 
+# the percentile_score array.
+#---------------------------------------------------------
+declare -A percentile_score=()
+for x in ${x_positions[@]}
+do
+  percentile_score[${x}]=`cat ${input_file} | grep "percentile ${x_to_percentile[${x}]}" | awk '{print $6}'`
+  echo "percentile score for ${x} is ${percentile_score[${x}]}"
+done
+
+MAX_Y=${percentile_score[80]}
+echo "MAX_Y is ${MAX_Y}"
+
+#------------------------------------------------
+# Write data to the data file in a form that 
+# gnuplot will be able to use.
+#------------------------------------------------
+DATA_FILE=${DATA_DIR}/sockperf_recv.data
+rm -f ${DATA_FILE}
+for x in ${x_positions[@]}
+do
+ echo "${x}   ${percentile_score[${x}]}   #  ${x_to_percentile[${x}]}" >> ${DATA_FILE}
+done
+
+DST=${RESULT_DIR}/under_load.jpg
+
+# Make the gnuplot file from the template.
+sed "s|DATA_FILE|${DATA_FILE}|" < ./gplot.template  > ./1.temp
+sed "s|DST|${DST}|"             < ./1.temp          > ./2.temp
+sed "s|MAX_Y|${MAX_Y}|"         < ./2.temp          > ./gplot
+rm ./1.temp
+
+# And plot the graph!
+gnuplot ./gplot
+
+
+# And display it, just for fun.
+display ${DST}

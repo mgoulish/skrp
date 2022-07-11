@@ -1,0 +1,10 @@
+
+Run it with the 'r' script.
+
+Edit the r script to change DURATION.
+
+Edit this file: 
+
+     ../../../utils/set_up_environment
+
+  to adapt this test to run in a new environment.

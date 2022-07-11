@@ -1,0 +1,7 @@
+
+The file ./set_up_environment is used by all tests
+to find the install dirs for the router and proton.
+
+Change that file to adapt all tests to runin a new 
+environment.
+

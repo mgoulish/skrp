@@ -1,0 +1,16 @@
+Latency Under Load
+------------------------------------
+
+This test starts a router with two TCP channels 
+through it.  ( I.e. two TCP listeners and two 
+connectors, each listener-connector pair using a 
+separate address. )
+
+In one TCP stream, use iperf3 to generate a lot of
+load.
+
+In the other stream, use sockperf to do a ping-pong
+latency test.
+
+This test is fully automated, all the way to 
+producing a graph and displaying it.

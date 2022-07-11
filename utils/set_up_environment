@@ -1,0 +1,8 @@
+#! /bin/bash
+
+INSTALL_ROOT=/home/mick/skupper_perf
+PROTON_INSTALL_DIR=${INSTALL_ROOT}/qpid-proton/install
+DISPATCH_INSTALL_DIR=${INSTALL_ROOT}/skupper-router/install
+export LD_LIBRARY_PATH=${DISPATCH_INSTALL_DIR}/lib:${PROTON_INSTALL_DIR}/lib64
+export PYTHONPATH=${DISPATCH_INSTALL_DIR}/lib/qpid-dispatch/python:${DISPATCH_INSTALL_DIR}/local/lib/python3.10/site-packages:/home/mick/skupper_perf/skupper-router/python
+ROUTER=${DISPATCH_INSTALL_DIR}/sbin/skrouterd
