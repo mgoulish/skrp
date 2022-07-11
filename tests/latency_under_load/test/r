@@ -1,6 +1,9 @@
 #! /bin/bash
 
-DURATION=15
+DURATION=60
+
+echo "Test duration is ${DURATION} seconds."
+sleep 5
 
 DATE=`date +"%Y_%m_%d_%H%M"`
 

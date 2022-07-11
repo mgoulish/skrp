@@ -80,7 +80,7 @@ DST=${RESULT_DIR}/under_load.jpg
 sed "s|DATA_FILE|${DATA_FILE}|" < ./gplot.template  > ./1.temp
 sed "s|DST|${DST}|"             < ./1.temp          > ./2.temp
 sed "s|MAX_Y|${MAX_Y}|"         < ./2.temp          > ./gplot
-rm ./1.temp
+rm ./*.temp
 
 # And plot the graph!
 gnuplot ./gplot
