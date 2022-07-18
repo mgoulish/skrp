@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
+#include <netinet/tcp.h>
 #include <netinet/in.h>
 
 void 
@@ -40,6 +41,17 @@ main ( int argc, char ** argv )
   if ( listen_socket_fd < 0 ) 
     error ( "server : error opening socket" );
 
+  /*
+  No help.
+  int one = 1;
+  setsockopt ( listen_socket_fd, 
+               IPPROTO_TCP, 
+               TCP_QUICKACK, 
+               & one, 
+               sizeof(one)
+             );
+  */
+
   bzero ( (char *) & serv_addr, sizeof(serv_addr) );
   serv_addr.sin_family      = AF_INET;
   serv_addr.sin_addr.s_addr = INADDR_ANY;
@@ -55,11 +67,23 @@ main ( int argc, char ** argv )
   int count = 0;
   while ( count < n )
   {
+    // NOTE! Using the SOMAXCONN flag here nearly 
+    // tripled my peer-to-peer connection speed.
     listen ( listen_socket_fd, SOMAXCONN );
     data_socket_fd = accept ( listen_socket_fd, 
                               (struct sockaddr *) & client_address, 
                               & client_address_length
                             );
+    /*
+    No help.
+    one = 1;
+    setsockopt ( data_socket_fd, 
+                 IPPROTO_TCP, 
+                 TCP_QUICKACK, 
+                 & one, 
+                 sizeof(one)
+               );
+    */
     if ( data_socket_fd < 0 ) 
       error("server : error on accept");
 
