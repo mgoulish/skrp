@@ -1,0 +1,57 @@
+#! /bin/bash
+
+DURATION=3600
+
+echo "test: Latency"
+echo "Test duration is ${DURATION} seconds."
+sleep 5
+
+DATE=`date +"%Y_%m_%d_%H%M"`
+
+# Make the output directory, and define output files -------------
+OUTPUT_DIR=../runs/${DATE}
+mkdir ${OUTPUT_DIR}
+ROUTER_OUTPUT=${OUTPUT_DIR}/router
+SOCKPERF_RECV_OUTPUT=${OUTPUT_DIR}/sockperf_recv
+SOCKPERF_SEND_OUTPUT=${OUTPUT_DIR}/sockperf_send
+
+# Store information about the system.
+cat /proc/cpuinfo > ${OUTPUT_DIR}/cpuinfo
+cat /proc/meminfo > ${OUTPUT_DIR}/meminfo
+
+# Start the router ------------------------------
+source ../../../utils/set_up_environment
+${ROUTER} --config ./skrouterd.conf > ${ROUTER_OUTPUT} 2>&1  &
+ROUTER_PID=$!
+echo "Router has started with PID ${ROUTER_PID}"
+
+sleep 3
+
+# Start the receivers ---------------------------
+sockperf sr -i 127.0.0.1 -p 5802 --tcp  > ${SOCKPERF_RECV_OUTPUT}  2>&1  &
+SOCKPERF_RECV_PID=$!
+echo "Receiver have started."
+
+sleep 3
+
+# Start the senders -----------------------------------
+sockperf pp -i 127.0.0.1 -p 5801 --tcp -m 100 -t ${DURATION} --mps=max > ${SOCKPERF_SEND_OUTPUT} 2>&1  &
+SOCKPERF_SEND_PID=$!
+echo -n "Sender started at time: "
+date
+echo "Test duration is ${DURATION}."
+
+
+# Wait for the sender to finish. -----------------------------------
+wait ${SOCKPERF_SEND_PID}
+echo "Sockperf sender has terminated."
+
+# Shut everything down --------------------------
+echo "Shutting down."
+kill -15 ${ROUTER_PID}
+kill -15 ${SOCKPERF_RECV_PID}
+
+
+# Process the output into a graph.
+./process_output  ${DATE}
+

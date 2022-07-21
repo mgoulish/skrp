@@ -1,0 +1,7 @@
+#! /bin/bash
+
+# Start the router ------------------------------
+source ../../../utils/set_up_environment
+${ROUTER} --config ./skrouterd.conf 
+ROUTER_PID=$!
+echo "Router has started with PID ${ROUTER_PID}"

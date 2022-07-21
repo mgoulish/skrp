@@ -7,11 +7,11 @@ set xlabel "seconds"
 
 set ylabel "Gbits/sec"
 
-set yrange [ 0 : 7.37 ]
+set yrange [ 0 : 7.54 ]
 
 
 set terminal jpeg size 1000, 500
-set output "../runs/2022_07_11_1252/result/throughput.jpg"
+set output "../runs/2022_07_20_1044/result/throughput.jpg"
 
-plot "../runs/2022_07_11_1252/data/iperf_send.data" with linespoints lt rgb "red" lw 2
+plot "../runs/2022_07_20_1044/data/iperf_send.data" with linespoints lt rgb "red" lw 2
 
