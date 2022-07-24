@@ -1,0 +1,5 @@
+#! /bin/bash
+
+cc     topology.c   -o topology
+
+
