@@ -1,0 +1,8 @@
+#! /bin/bash
+
+sleep_until_minute
+
+# Start the router ------------------------------
+source /home/mick/skrp/utils/set_up_environment
+${ROUTER} --config ./router_2.conf
+
