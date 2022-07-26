@@ -1,0 +1,15 @@
+set title "Ring Topology Router Networks Startup Time"
+
+set   autoscale
+unset key
+
+
+set xlabel "Number of Routers"
+
+set ylabel "Startup Time in Seconds"
+
+set terminal jpeg size 1000, 500
+set output "ring_network_startup_time.jpg"
+
+plot "./data" with linespoints lt rgb "red" lw 2
+

@@ -1,0 +1,5 @@
+#! /bin/bash
+
+gnuplot ./gplot
+display ring_network_startup_time.jpg
+

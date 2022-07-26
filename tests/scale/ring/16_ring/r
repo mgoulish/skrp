@@ -1,0 +1,19 @@
+#! /bin/bash
+
+./router_0_run.sh &
+./router_1_run.sh &
+./router_2_run.sh &
+./router_3_run.sh &
+./router_4_run.sh &
+./router_5_run.sh &
+./router_6_run.sh &
+./router_7_run.sh &
+./router_8_run.sh &
+./router_9_run.sh &
+./router_10_run.sh &
+./router_11_run.sh &
+./router_12_run.sh &
+./router_13_run.sh &
+./router_14_run.sh &
+./router_15_run.sh &
+

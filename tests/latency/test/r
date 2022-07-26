@@ -30,7 +30,7 @@ sleep 3
 # Start the receivers ---------------------------
 sockperf sr -i 127.0.0.1 -p 5802 --tcp  > ${SOCKPERF_RECV_OUTPUT}  2>&1  &
 SOCKPERF_RECV_PID=$!
-echo "Receiver have started."
+echo "Receiver has started."
 
 sleep 3
 
