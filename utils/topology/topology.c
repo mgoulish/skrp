@@ -66,19 +66,40 @@ connect ( topology_p top, int a, int b )
 
 
 void
-make_ring ( topology_p top, int size, int amqp_port )
+mesh ( topology_p top, int size, int amqp_listen_port )
 {
   top->n_routers = size;
 
   sprintf ( top->name, "%d_ring", top->n_routers );
 
-  // Make router names and set AMQP ports.
+  // Make router names and set AMQP listen ports.
   for ( int i = 0; i < top->n_routers; ++ i )
   {
     router_p router = top->routers + i;
     router->n_connections = 0;
     sprintf ( router->name, "router_%d", i );
-    router->amqp_listener_port = amqp_port + i;
+    router->amqp_listener_port = amqp_listen_port + i;
+  }
+
+  // Make the connections.
+}
+
+
+
+void
+ring ( topology_p top, int size, int amqp_listen_port )
+{
+  top->n_routers = size;
+
+  sprintf ( top->name, "%d_ring", top->n_routers );
+
+  // Make router names and set AMQP listen ports.
+  for ( int i = 0; i < top->n_routers; ++ i )
+  {
+    router_p router = top->routers + i;
+    router->n_connections = 0;
+    sprintf ( router->name, "router_%d", i );
+    router->amqp_listener_port = amqp_listen_port + i;
   }
 
   // Make the connection pattern.
@@ -175,7 +196,7 @@ main ( int argc, char ** argv )
 {
   topology_t topology;
 
-  make_ring      ( & topology, 12, 20000 );
+  ring      ( & topology, 100, 20000 );
   write_topology ( & topology );
 }
 

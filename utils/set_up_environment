@@ -1,7 +1,8 @@
 #! /bin/bash
 
 # Change these three to personalize for your system.
-INSTALL_ROOT=/home/mick/skupper_perf
+#INSTALL_ROOT=/home/mick/skupper_perf
+INSTALL_ROOT=/home/mick/latest
 PROTON_INSTALL_DIR=${INSTALL_ROOT}/qpid-proton/install
 DISPATCH_INSTALL_DIR=${INSTALL_ROOT}/skupper-router/install
 

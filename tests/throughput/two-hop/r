@@ -1,0 +1,158 @@
+#! /bin/bash
+
+DURATION=60
+
+streams=(1)
+connections=(1 2 3 4 5 6 7 8)
+threads=(1 2 3 4 5 6 7 8)
+#streams=(1)
+#connections=(1)
+#threads=(4)
+
+for N_STREAMS in "${streams[@]}"
+do
+  for N_CNX in "${connections[@]}"
+  do
+    for N_THREADS in "${threads[@]}"
+    do
+      echo "Running: Streams ${N_STREAMS} Cnx ${N_CNX} Threads ${N_THREADS}"
+      RUN_NAME=${N_STREAMS}_${N_CNX}_${N_THREADS}
+
+      echo "test: Two-Hop Throughput Test ${RUN_NAME}"
+      echo "Test duration is ${DURATION} seconds."
+      sleep 5
+
+      DATE=`date +"%Y_%m_%d_%H%M"`
+
+      OUTPUT_DIR=./runs/${RUN_NAME}
+      mkdir ${OUTPUT_DIR}
+      touch ${OUTPUT_DIR}/date_${DATE}
+
+
+      ROUTER_A_OUTPUT=${OUTPUT_DIR}/router_a
+      ROUTER_B_OUTPUT=${OUTPUT_DIR}/router_b
+      IPERF_RECV_OUTPUT=${OUTPUT_DIR}/iperf_recv
+      IPERF_SEND_OUTPUT=${OUTPUT_DIR}/iperf_send
+
+      # Prepare the config files
+
+      sed "s|N_THREADS|${N_THREADS}|" < ./A.template > ./A1.temp
+      sed "s|N_CNX|${N_CNX}|"         < ./A1.temp    > ./A.conf
+
+      sed "s|N_THREADS|${N_THREADS}|" < ./B.template > ./B.conf
+
+      rm ./*.temp
+
+      # Start the routers ------------------------------
+      source ../../../utils/set_up_environment
+
+      ${ROUTER} --config ./A.conf > ${ROUTER_A_OUTPUT} 2>&1  &
+      ROUTER_A_PID=$!
+      echo "Router A has started with PID ${ROUTER_A_PID}"
+
+      sleep 3
+      ./watch_router_core.sh  ${ROUTER_A_PID} > ${OUTPUT_DIR}/router_a_core_cpu  2>&1  &
+
+      ${ROUTER} --config ./B.conf > ${ROUTER_B_OUTPUT} 2>&1  &
+      ROUTER_B_PID=$!
+      echo "Router B has started with PID ${ROUTER_B_PID}"
+
+      sleep 5
+      ./watch_router_core.sh  ${ROUTER_B_PID} > ${OUTPUT_DIR}/router_b_core_cpu  2>&1  &
+
+
+      # Start the receiver ---------------------------
+      # TODO Make these ports a variable
+      iperf3 -s -p 5802 > ${IPERF_RECV_OUTPUT}     2>&1  &
+      IPERF_RECV_PID=$!
+      sleep 3
+
+
+      # Start the sender -----------------------------------
+      iperf3 -c 127.0.0.1 -p 5801 -t ${DURATION} -P ${N_STREAMS} > ${IPERF_SEND_OUTPUT}     2>&1  &
+      IPERF_SEND_PID=$!
+      echo -n "Sender started at time: "
+      date
+      echo "Test duration is ${DURATION}."
+
+      # Capture Ken's data.
+      #sleep 10
+      #echo "Capturing Ken's Data..."
+      #perf script flamegraph --freq 99 --call-graph dwarf --pid ${ROUTER_PID}  sleep 10
+
+      # Wait for the sender to finish. -----------------------------------
+      wait ${IPERF_SEND_PID}
+      echo "Iperf sender has terminated."
+
+      # Shut everything down --------------------------
+      echo "Shutting down."
+      kill -15 ${IPERF_RECV_PID}
+      sleep 3
+      kill -15 ${ROUTER_A_PID}
+      sleep 3
+      kill -15 ${ROUTER_B_PID}
+    done
+  done
+done
+
+
+
+#==========================================
+# Process the data
+#==========================================
+for N_STREAMS in "${streams[@]}"
+do
+  # We will do one 2-dimensional output file for
+  # each value on the streams dimension.
+  # This makes it more like a customer would think.
+  OUTPUT_FILE=./results/result_${N_STREAMS}
+
+  for N_CNX in "${connections[@]}"
+  do
+    for N_THREADS in "${threads[@]}"
+    do
+      echo "Processing: Streams ${N_STREAMS} Cnx ${N_CNX} Threads ${N_THREADS}"
+      RUN_NAME=${N_STREAMS}_${N_CNX}_${N_THREADS}
+      if [ ${N_STREAMS} -eq 1 ]
+      then
+        # Don't search for "\<0.00-60.00" 
+        # because sometimes it's 60.01 or whatever.
+        VAL=`cat ./runs/${RUN_NAME}/iperf_recv | grep "\<0.00-${DURATION}" | awk '{print $7}'`
+      else
+        # head -1 because once in a great while it repeats!
+        VAL=`cat ./runs/${RUN_NAME}/iperf_recv | grep "\<0.00-${DURATION}" | grep SUM | head -1 | awk '{print $6}'`
+      fi
+
+      # Store 2-D result to result file.
+      echo "${N_CNX} ${N_THREADS} ${VAL}" >> ${OUTPUT_FILE}
+    done
+  done
+  # Call the graphics once for each N_STREAMS
+
+  # The X-labels are the numbers of connections.
+  X_LABEL_ORIGIN=${connections[0]}
+  X_LABEL_SIZE=${#connections[@]}
+
+  # The Y-labels are the numbers of threads
+  Y_LABEL_ORIGIN=${threads[0]}
+  Y_LABEL_SIZE=${#threads[@]}
+
+  # You just have to know this...
+  GRAND_MAX_VAL=30
+
+  echo "Making graphics for N_STREAMS == ${N_STREAMS}"
+  ./result_graphics.py ${OUTPUT_FILE}    \
+                       ${N_STREAMS}      \
+                       ${X_LABEL_ORIGIN} \
+                       ${X_LABEL_SIZE}   \
+                       ${Y_LABEL_ORIGIN} \
+                       ${Y_LABEL_SIZE}   \
+                       ${GRAND_MAX_VAL}
+
+done
+
+
+
+
+
+

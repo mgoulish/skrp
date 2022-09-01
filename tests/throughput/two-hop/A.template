@@ -1,0 +1,24 @@
+router {
+    mode: interior
+    id: A
+    workerThreads: N_THREADS
+}
+
+tcpListener {
+  host: 0.0.0.0
+  port: 5801
+  address: iperf-test
+  siteId: my-site
+}
+
+connector {
+    stripAnnotations: no
+    name: connectorToA
+    idleTimeoutSeconds: 120
+    saslMechanisms: ANONYMOUS
+    host: 127.0.0.1
+    role: inter-router
+    port: 20001
+    dataConnectionCount: N_CNX
+}
+
