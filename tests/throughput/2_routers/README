@@ -1,0 +1,31 @@
+
+
+First, do ./run_test   .
+
+No, wait.
+
+First *look* at ./run_test and see if you want 
+to change and of the user-settable parameters 
+at the top.
+
+It will run a whole bunch of tests with 
+different settings for:
+
+   * number of parallel iperf sender threads
+
+   * amount of CPU allocated to each router
+
+And it will run each test several times and
+when you process the results those iterations
+will be averaged.
+
+
+
+When the test is done, you run ./process_results
+
+It will produce a graph showing how throughput 
+varied across different number of threads and
+diffrent CPU allocations.
+
+
+./run_process_results uses ./process_results.py 

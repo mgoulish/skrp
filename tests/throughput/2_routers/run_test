@@ -1,0 +1,104 @@
+#! /bin/bash
+
+
+#----------------------------------------------------------
+# Begin user-settable parameters 
+#----------------------------------------------------------
+
+# Set this based on which version of the Router software you have installed.
+ROUTER_VERSION=3.4.1
+
+# And set this to which test you want to run.
+TEST=throughput
+
+# How long should each test last?
+# I tried 60 seconds, and they were indistinguishable from 15 seconds
+# with respect to stability of results.
+DURATION=15
+
+# Each graphed result will the the average of several identically 
+# configured tests, the number controlled by this variable.
+ITERATIONS="1 2 3"
+
+# The CPU allocation for each router during the tests.
+CPU_LIMITS="500 400 300 200 100 50 25"
+
+
+#----------------------------------------------------------
+# End user-settable parameters 
+#----------------------------------------------------------
+
+
+RESULT_DIR=../../../results/${ROUTER_VERSION}/${TEST}/test_results
+echo "RESULT_DIR == ${RESULT_DIR}"
+
+
+# Your router is installed in the standard place.
+ROUTER=/usr/local/sbin/skrouterd
+
+
+echo "Starting routers from ${ROUTER}"
+
+
+for CPU in ${CPU_LIMITS} ; do
+
+  echo "==========================================================="
+  echo "CPU ${CPU} "
+  echo "==========================================================="
+
+  systemd-run --user --scope -p CPUQuota=${CPU}% -p MemoryMax=4G ${ROUTER} --config ./A.conf &
+  echo "Router A started"
+  sleep 5
+  
+  
+  systemd-run --user --scope -p CPUQuota=${CPU}% -p MemoryMax=4G ${ROUTER} --config ./B.conf &
+  ROUTER_B_PID=$!
+  echo "Router B started with PID ${ROUTER_PID}"
+  
+  # Give plenty of time for the routers to set up the network
+  sleep 10
+  
+  
+  # Start the server. This is only done once.
+  iperf3 -s -p 5801 &
+  SERVER_PID=$!
+  echo "server started"
+  
+  
+  
+  for THREADS in 1 2 5 10; do
+    echo "==========================================================="
+    echo "threads ${THREADS} "
+    echo "==========================================================="
+    sleep 1
+    for ITERATION in ${ITERATIONS}; do 
+      echo " "
+      echo " "
+      echo "----------------------------------"
+      echo "iteration ${ITERATION}"
+      echo "----------------------------------"
+      RESULT_NAME="cpu_${CPU}_threads_${THREADS}_iteration_${ITERATION}"
+  
+      # Run the client
+      iperf3 -c 127.0.0.1 -p 5800 -P ${THREADS} -t ${DURATION} > ${RESULT_DIR}/${RESULT_NAME}
+      echo " "
+      echo "threads ${THREADS} iteration ${ITERATION} complete"
+      sleep 5
+    done
+  done
+  
+  sleep 5
+  echo " "
+  echo "killing server at PID ${SERVER_PID}"
+  kill -9 ${SERVER_PID}
+  echo "killing routers..."
+  pkill skrouterd
+  sleep 2
+  pkill skrouterd
+  sleep 2
+  echo "Any routers remaining?"
+  ps -aef | grep skrouterd | grep -v grep
+  echo " "
+  echo " "
+  echo " "
+done

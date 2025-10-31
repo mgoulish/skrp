@@ -1,0 +1,37 @@
+#! /bin/bash
+
+pkill iperf3
+rm -rf ./results
+mkdir  ./results
+
+PORT=5801
+DURATION=15
+ITERATIONS="1 2 3 4 5"
+
+
+iperf3 -s -p ${PORT} &
+SERVER_PID=$!
+echo "server started"
+
+for ITERATION in ${ITERATIONS}; do 
+  for THREADS in 1 2 5 10; do
+    RESULT_NAME="threads_${THREADS}_iteration_${ITERATION}"
+    echo " "
+    echo " "
+    echo "----------------------------------"
+    echo "test using ${THREADS} threads"
+    echo "----------------------------------"
+    iperf3 -c 127.0.0.1 -p ${PORT} -P ${THREADS} -t ${DURATION} | tee ./results/${RESULT_NAME}
+    echo " "
+    echo "test with ${THREADS} threads complete"
+    sleep 5
+  done
+done
+
+sleep 5
+echo " "
+echo "killing server at PID == ${SERVER_PID}"
+kill -9 ${SERVER_PID}
+echo " "
+echo " "
+echo " "

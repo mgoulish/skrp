@@ -1,0 +1,45 @@
+#! /bin/bash
+
+pkill iperf3
+rm -rf ./results
+mkdir  ./results
+
+DURATION=15
+ITERATIONS="1 2 3 4 5"
+
+ROUTER=/usr/local/sbin/skrouterd
+echo "Starting router from ${ROUTER}"
+${ROUTER} --config ./A.conf &
+ROUTER_PID=$!
+echo "Router started with PID ${ROUTER_PID}"
+sleep 5
+
+
+iperf3 -s -p 5801 &
+SERVER_PID=$!
+echo "server started"
+
+for ITERATION in ${ITERATIONS}; do 
+  for THREADS in 1 2 5 10; do
+    RESULT_NAME="threads_${THREADS}_iteration_${ITERATION}"
+    echo " "
+    echo " "
+    echo "----------------------------------"
+    echo "test using ${THREADS} threads"
+    echo "----------------------------------"
+    iperf3 -c 127.0.0.1 -p 5800 -P ${THREADS} -t ${DURATION} | tee ./results/${RESULT_NAME}
+    echo " "
+    echo "test with ${THREADS} threads complete"
+    sleep 5
+  done
+done
+
+sleep 5
+echo " "
+echo "killing server at PID ${SERVER_PID}"
+kill -9 ${SERVER_PID}
+echo "killing router at PID ${ROUTER_PID}"
+kill -9 ${ROUTER_PID}
+echo " "
+echo " "
+echo " "
