@@ -72,15 +72,14 @@ def make_gnuplot_file ( CPUs, RESULTS_ROOT, ROUTER_VERSION ) :
     f.write('set terminal jpeg size 1000, 1000\n')
     f.write(f'set output "{RESULTS_ROOT}/graphs/all_cpus.jpg"\n')
     f.write('plot ')
-    colors = ['red', 'orange', 'gold', 'greenyellow', 'forest-green', 'dark-turquoise',
-              'blue', 'dark-violet', 'gray40', 'gray0' ]
+    colors = ['red', 'orange', 'gold', 'greenyellow', 'dark-turquoise', 
+              'forest-green', 'blue', 'dark-violet', 'gray40', 'gray0' ]
     count = 1
     for CPU in CPUs:
       color_number = count - 1
       if color_number > len(colors) - 1 :
         color_number = len(colors) - 1
       color = colors[color_number]
-      print ( f"color {color}" )
       f.write ( f'"{RESULTS_ROOT}/data/cpu_{CPU}.data" u (last_x{count}=$1):(last_y{count}=$2) with linespoints lt rgb "{color}" lw 3 pt 7 ps 2, \\\n' )
       count += 1
     

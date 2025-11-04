@@ -6,7 +6,7 @@
 #----------------------------------------------------------
 
 # Set this based on which version of the Router software you have installed.
-ROUTER_VERSION=3.4.1
+ROUTER_VERSION=3.4.0
 
 # And set this to which test you want to run.
 TEST=throughput
@@ -21,7 +21,7 @@ DURATION=15
 ITERATIONS="1 2 3"
 
 # The CPU allocation for each router during the tests.
-CPU_LIMITS="500 400 300 200 100 50 25"
+CPU_LIMITS="400 300 200 100 50 25"
 
 
 #----------------------------------------------------------
@@ -29,8 +29,13 @@ CPU_LIMITS="500 400 300 200 100 50 25"
 #----------------------------------------------------------
 
 
-RESULT_DIR=../../../results/${ROUTER_VERSION}/${TEST}/test_results
-echo "RESULT_DIR == ${RESULT_DIR}"
+RESULT_ROOT=../../../results/${ROUTER_VERSION}/${TEST}
+TEST_RESULTS_DIR=../../../results/${ROUTER_VERSION}/${TEST}/test_results
+echo "TEST_RESUTS_DIR == ${TEST_RESUTS_DIR}"
+
+mkdir -p ${RESULT_ROOT}/test_results
+mkdir -p ${RESULT_ROOT}/data
+mkdir -p ${RESULT_ROOT}/graphs
 
 
 # Your router is installed in the standard place.
@@ -38,7 +43,7 @@ ROUTER=/usr/local/sbin/skrouterd
 
 
 echo "Starting routers from ${ROUTER}"
-
+date
 
 for CPU in ${CPU_LIMITS} ; do
 
@@ -80,7 +85,7 @@ for CPU in ${CPU_LIMITS} ; do
       RESULT_NAME="cpu_${CPU}_threads_${THREADS}_iteration_${ITERATION}"
   
       # Run the client
-      iperf3 -c 127.0.0.1 -p 5800 -P ${THREADS} -t ${DURATION} > ${RESULT_DIR}/${RESULT_NAME}
+      iperf3 -c 127.0.0.1 -p 5800 -P ${THREADS} -t ${DURATION} > ${TEST_RESULTS_DIR}/${RESULT_NAME}
       echo " "
       echo "threads ${THREADS} iteration ${ITERATION} complete"
       sleep 5
@@ -102,3 +107,5 @@ for CPU in ${CPU_LIMITS} ; do
   echo " "
   echo " "
 done
+
+date
