@@ -1,0 +1,20 @@
+router {
+    mode: interior
+    id: A
+    workerThreads: N_THREADS
+}
+listener {
+    stripAnnotations: no
+    idleTimeoutSeconds: 120
+    saslMechanisms: ANONYMOUS
+    host: 0.0.0.0
+    role: inter-router
+    authenticatePeer: no
+    port: 25000
+}
+tcpListener {
+    host: 0.0.0.0
+    port: 5800
+    address: router-test
+    siteId: two-router-test
+}

@@ -6,7 +6,7 @@
 #----------------------------------------------------------
 
 # Set this based on which version of the Router software you have installed.
-ROUTER_VERSION=3.4.0
+ROUTER_VERSION=3.4.1
 
 # And set this to which test you want to run.
 TEST=throughput
@@ -21,7 +21,15 @@ DURATION=15
 ITERATIONS="1 2 3"
 
 # The CPU allocation for each router during the tests.
-CPU_LIMITS="400 300 200 100 50 25"
+#CPU_LIMITS="400 300 200 100 50 25"
+CPU_LIMITS="300 200 100"
+
+
+#ROUTER_THREADS="1 2 4 5 8"
+ROUTER_THREADS="2 4 5"
+
+#SENDER_THREADS="1 2 5 10"
+SENDER_THREADS="1 2 5"
 
 
 #----------------------------------------------------------
@@ -45,67 +53,77 @@ ROUTER=/usr/local/sbin/skrouterd
 echo "Starting routers from ${ROUTER}"
 date
 
-for CPU in ${CPU_LIMITS} ; do
-
+for RT in ${ROUTER_THREADS} ; do
   echo "==========================================================="
-  echo "CPU ${CPU} "
+  echo "Router threads ${RT} "
   echo "==========================================================="
+  # Create the router config files
+  sed "s/N_THREADS/${RT}/"   < A.conf.template    > A.conf
+  sed "s/N_THREADS/${RT}/"   < B.conf.template    > B.conf
 
-  systemd-run --user --scope -p CPUQuota=${CPU}% -p MemoryMax=4G ${ROUTER} --config ./A.conf &
-  echo "Router A started"
-  sleep 5
-  
-  
-  systemd-run --user --scope -p CPUQuota=${CPU}% -p MemoryMax=4G ${ROUTER} --config ./B.conf &
-  ROUTER_B_PID=$!
-  echo "Router B started with PID ${ROUTER_PID}"
-  
-  # Give plenty of time for the routers to set up the network
-  sleep 10
-  
-  
-  # Start the server. This is only done once.
-  iperf3 -s -p 5801 &
-  SERVER_PID=$!
-  echo "server started"
-  
-  
-  
-  for THREADS in 1 2 5 10; do
+
+  for CPU in ${CPU_LIMITS} ; do
+
     echo "==========================================================="
-    echo "threads ${THREADS} "
+    echo "CPU ${CPU} "
     echo "==========================================================="
-    sleep 1
-    for ITERATION in ${ITERATIONS}; do 
-      echo " "
-      echo " "
-      echo "----------------------------------"
-      echo "iteration ${ITERATION}"
-      echo "----------------------------------"
-      RESULT_NAME="cpu_${CPU}_threads_${THREADS}_iteration_${ITERATION}"
-  
-      # Run the client
-      iperf3 -c 127.0.0.1 -p 5800 -P ${THREADS} -t ${DURATION} > ${TEST_RESULTS_DIR}/${RESULT_NAME}
-      echo " "
-      echo "threads ${THREADS} iteration ${ITERATION} complete"
-      sleep 5
+
+    systemd-run --user --scope -p CPUQuota=${CPU}% -p MemoryMax=4G ${ROUTER} --config ./A.conf &
+    echo "Router A started"
+    sleep 5
+    
+    
+    systemd-run --user --scope -p CPUQuota=${CPU}% -p MemoryMax=4G ${ROUTER} --config ./B.conf &
+    ROUTER_B_PID=$!
+    echo "Router B started with PID ${ROUTER_PID}"
+    
+    # Give plenty of time for the routers to set up the network
+    sleep 10
+    
+    
+    # Start the server. This is only done once.
+    iperf3 -s -p 5801 &
+    SERVER_PID=$!
+    echo "server started"
+    
+    
+    
+    for ST in ${SENDER_THREADS}; do
+      echo "==========================================================="
+      echo "sender threads ${ST} "
+      echo "==========================================================="
+      sleep 1
+      for ITERATION in ${ITERATIONS}; do 
+        echo " "
+        echo " "
+        echo "----------------------------------"
+        echo "iteration ${ITERATION}"
+        echo "----------------------------------"
+        RESULT_NAME="cpu_${CPU}_sender-threads_${ST}_router-threads_${RT}_iteration_${ITERATION}"
+    
+        # Run the client
+        iperf3 -c 127.0.0.1 -p 5800 -P ${ST} -t ${DURATION} > ${TEST_RESULTS_DIR}/${RESULT_NAME}
+        echo " "
+        echo "threads ${THREADS} iteration ${ITERATION} complete"
+        sleep 5
+      done
     done
+    
+    sleep 5
+    echo " "
+    echo "killing server at PID ${SERVER_PID}"
+    kill -9 ${SERVER_PID}
+    echo "killing routers..."
+    pkill skrouterd
+    sleep 2
+    pkill skrouterd
+    sleep 2
+    echo "Any routers remaining?"
+    ps -aef | grep skrouterd | grep -v grep
+    echo " "
+    echo " "
+    echo " "
   done
-  
-  sleep 5
-  echo " "
-  echo "killing server at PID ${SERVER_PID}"
-  kill -9 ${SERVER_PID}
-  echo "killing routers..."
-  pkill skrouterd
-  sleep 2
-  pkill skrouterd
-  sleep 2
-  echo "Any routers remaining?"
-  ps -aef | grep skrouterd | grep -v grep
-  echo " "
-  echo " "
-  echo " "
 done
 
 date
