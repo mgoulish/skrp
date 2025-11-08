@@ -3,6 +3,10 @@
 import os
 import sys
 import pprint
+import subprocess
+import shutil
+
+
 
 
 def new_cpu ( cpu_values_set ) :
@@ -67,8 +71,18 @@ def find_throughput_from_file ( file_path, n_sender_threads ) :
 #==================================================
 
 if len(sys.argv) < 2 :
-  print ("give me router version on command line")
-  sys.exit(1)
+  print ( "error: give me router version on command line" )
+  sys.exit( 1 )
+
+if not shutil.which ( "gnuplot" ) :
+  print ( "error: I need gnuplot installed." )
+  sys.exit ( 1 )
+
+if not shutil.which ( "display" ) :
+  print ( "error: can't find gnuplot utility 'display' ." )
+  sys.exit ( 1 )
+
+
 
 ROUTER_VERSION    = sys.argv[1]
 TEST              = 'throughput'
@@ -217,7 +231,7 @@ for cpu_val in CPUs :
     f.write ( f"set output '{gnuplot_image_file_path}'\n" )
     f.write (  "set palette rgbformulae 33,13,10\n" )
     f.write (  "set colorbox\n" )
-    f.write ( f'set title "Throughput for CPU {cpu_val}" font ",24" \n' )
+    f.write ( f'set title "Version {ROUTER_VERSION} : Throughput for CPU {cpu_val}" font ",24" \n' )
     f.write (  'set xlabel "Router Threads" font ",20" \n' )
     f.write (  'set ylabel "Sender Threads" font ",20" \n' )
 
@@ -242,5 +256,14 @@ for cpu_val in CPUs :
     f.write (  "set autoscale cbfix\n" )
     f.write ( f"plot '{gnuplot_data_file_path}' matrix with image title \"\", \\\n" )
     f.write (  "     \"\"     matrix using 1:2:(sprintf('%.1f', $3)) with labels center font \",16\"" )
+
+  # Now that we have the gnuplot file, let's call gnuplot on it.
+  subprocess.call ( ["gnuplot", gnuplot_script_file_path ] )
+  if os.path.exists ( gnuplot_image_file_path ) :
+    subprocess.Popen ( ["display", gnuplot_image_file_path ] )
+  else :
+    print ( f"error: image file {gnuplot_image_file_path} was not created" )
+
+    
     
 

@@ -2,13 +2,8 @@
 
 ROUTER_VERSION=3.4.1
 
+
 ./process_results.py  ${ROUTER_VERSION}
 
-#gnuplot -c ./gnuplot/gplot  ${ROUTER_VERSION}  ../../../results/${ROUTER_VERSION}/throughput/
-#gnuplot ../../../results/${ROUTER_VERSION}/throughput/graphs/gplot
-#
-#ls -l ../../../results/${ROUTER_VERSION}/throughput/graphs/all_cpus.jpg 
-#
-#display ../../../results/${ROUTER_VERSION}/throughput/graphs/all_cpus.jpg &
 
 
