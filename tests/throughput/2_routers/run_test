@@ -6,7 +6,7 @@
 #----------------------------------------------------------
 
 # Set this based on which version of the Router software you have installed.
-ROUTER_VERSION=3.4.1-run2
+ROUTER_VERSION=3.4.1
 
 # And set this to which test you want to run.
 TEST=throughput
@@ -130,5 +130,16 @@ for RT in ${ROUTER_THREADS} ; do
     echo " "
   done
 done
-
 date
+
+echo "\n\n\n======================================="
+echo "Running results post-processing"
+echo "=======================================\n\n\n"
+sleep 10
+
+./process_results.py ${ROUTER_VERSION}
+
+
+echo "\n\ndone\n\n\n"
+
+
