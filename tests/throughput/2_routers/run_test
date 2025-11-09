@@ -6,7 +6,7 @@
 #----------------------------------------------------------
 
 # Set this based on which version of the Router software you have installed.
-ROUTER_VERSION=3.4.1
+ROUTER_VERSION=3.4.1-run2
 
 # And set this to which test you want to run.
 TEST=throughput
@@ -39,11 +39,12 @@ SENDER_THREADS="1 2 5"
 
 RESULT_ROOT=../../../results/${ROUTER_VERSION}/${TEST}
 TEST_RESULTS_DIR=../../../results/${ROUTER_VERSION}/${TEST}/test_results
-echo "TEST_RESUTS_DIR == ${TEST_RESUTS_DIR}"
+echo "TEST_RESULTS_DIR == ${TEST_RESULTS_DIR}"
 
 mkdir -p ${RESULT_ROOT}/test_results
 mkdir -p ${RESULT_ROOT}/data
 mkdir -p ${RESULT_ROOT}/graphs
+mkdir -p ${RESULT_ROOT}/routers
 
 
 # Your router is installed in the standard place.
@@ -68,18 +69,22 @@ for RT in ${ROUTER_THREADS} ; do
     echo "CPU ${CPU} "
     echo "==========================================================="
 
-    systemd-run --user --scope -p CPUQuota=${CPU}% -p MemoryMax=4G ${ROUTER} --config ./A.conf &
+    # Start Router A --------------------------------
+    # I don't want to constrain memory
+    #systemd-run --quiet --user --scope -p CPUQuota=${CPU}% -p MemoryMax=4G ${ROUTER} --config ./A.conf > router.log 2>&1 &
+    systemd-run --quiet --user --scope -p CPUQuota=${CPU}% ${ROUTER} --config ./A.conf > ${RESULT_ROOT}/routers/A.log 2>&1 &
     echo "Router A started"
     sleep 5
     
-    
-    systemd-run --user --scope -p CPUQuota=${CPU}% -p MemoryMax=4G ${ROUTER} --config ./B.conf &
+    # Start Router B --------------------------------
+    systemd-run --quiet --user --scope -p CPUQuota=${CPU}% ${ROUTER} --config ./B.conf > ${RESULT_ROOT}/routers/B.log 2>&1 &
     ROUTER_B_PID=$!
     echo "Router B started with PID ${ROUTER_PID}"
     
     # Give plenty of time for the routers to set up the network
     sleep 10
     
+
     
     # Start the server. This is only done once.
     iperf3 -s -p 5801 &
