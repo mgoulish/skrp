@@ -103,8 +103,10 @@ iterations_set      = set()
 #        4    router-threads
 #        6    iteration
 
-# Go through all the files to collect all
-# values of CPUs, sender threads, router threads, and iterations.
+#---------------------------------------------------------
+# Go through all the files to collect all values of 
+# CPUs, sender threads, router threads, and iterations.
+#---------------------------------------------------------
 for file_name in os.listdir ( TEST_RESULTS_DIR ) :
   name_components = file_name.split('_')
   if name_components[0] != 'cpu'            or \
@@ -143,7 +145,7 @@ for cpu_value in CPUs :
 
 
 # Now go through all the files again to read
-# the throughput values.  The payload.
+# the throughput values.  This is the payload.
 for file_name in os.listdir ( TEST_RESULTS_DIR ) :
   file_path = os.path.join ( TEST_RESULTS_DIR, file_name )
   name_components = file_name.split('_')
@@ -168,6 +170,9 @@ for file_name in os.listdir ( TEST_RESULTS_DIR ) :
 # Walk through the dictionary tree to get down to 
 # the test iterations, and find and store their averages.
 #----------------------------------------------------------
+throughput_global_minimum = 10000.0
+throughput_global_maximum = -10000.0
+
 for cpu_val in CPUs :
   sender_threads_dict = CPUs[cpu_val]
   for sender_threads_val in sender_threads_dict :
@@ -183,6 +188,11 @@ for cpu_val in CPUs :
       # this, and overload it to store the average across iterations. 
       # But. Who's gonna know?
       iteration_dict['average'] = throughput_avg
+
+      if throughput_avg < throughput_global_minimum :
+        throughput_global_minimum = throughput_avg
+      if throughput_avg > throughput_global_maximum :
+        throughput_global_maximum = throughput_avg
 
 # Now make the data files that will be used by gnuplot for the graphs.
 #
@@ -251,6 +261,7 @@ for cpu_val in CPUs :
       count += 1
     f.write (  ")\n" )
 
+    f.write ( f"set cbrange [{throughput_global_minimum}:{throughput_global_maximum}]\n" )
     f.write (  "set autoscale xfix\n" )
     f.write (  "set autoscale yfix\n" )
     f.write (  "set autoscale cbfix\n" )
