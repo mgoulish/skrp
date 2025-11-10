@@ -160,8 +160,12 @@ for file_name in os.listdir ( TEST_RESULTS_DIR ) :
   throughput, units = find_throughput_from_file ( file_path, sender_threads_val )
 
   if units != 'Gbits/sec' :
-    print ( f"error: unknown units:{units} in file {file_name}" )
-    sys.exit ( 1 )
+    if units == 'Mbits/sec' :
+      throughput = float(throughput) / 1000.0
+      units = 'Gbits/sec'
+    else :
+      print ( f"error: unknown units:{units} in file {file_name}" )
+      sys.exit ( 1 )
   
   CPUs[cpu_val][sender_threads_val][router_threads_val][iteration_val]['throughput'] = throughput
   CPUs[cpu_val][sender_threads_val][router_threads_val][iteration_val]['units']      = units

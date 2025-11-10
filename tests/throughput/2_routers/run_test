@@ -21,17 +21,11 @@ DURATION=15
 ITERATIONS="1 2 3"
 
 # The CPU allocation for each router during the tests.
-#CPU_LIMITS="400 300 200 100 50 25"
-CPU_LIMITS="300 200 100"
+CPU_LIMITS="500 400 300 200 100 50 25"
 
+ROUTER_THREADS="1 2 4 5 7 10"
 
-#ROUTER_THREADS="1 2 4 5 8"
-ROUTER_THREADS="2 4 5"
-
-#SENDER_THREADS="1 2 5 10"
-SENDER_THREADS="1 2 5"
-
-
+SENDER_THREADS="1 2 5 10"
 #----------------------------------------------------------
 # End user-settable parameters 
 #----------------------------------------------------------
