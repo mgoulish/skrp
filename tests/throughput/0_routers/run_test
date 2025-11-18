@@ -1,31 +1,36 @@
 #! /bin/bash
 
 pkill iperf3
-rm -rf ./results
-mkdir  ./results
 
 PORT=5801
 DURATION=15
-ITERATIONS="1 2 3 4 5"
+THREADS_SETTINGS="1 2 3 4 5 6 7 8 9 10 12 14 16 18 20"
+
+TEST_NAME=throughput
+
+RESULTS_DIR=../../../results/iperf/throughput/test_results
+mkdir -p ${RESULTS_DIR}
 
 
+# Start the server -- one for all tests
 iperf3 -s -p ${PORT} &
 SERVER_PID=$!
-echo "server started"
+echo "server started with PID ${SERVER_PID}"
 
-for ITERATION in ${ITERATIONS}; do 
-  for THREADS in 1 2 5 10; do
-    RESULT_NAME="threads_${THREADS}_iteration_${ITERATION}"
+
+# Run each client and capture output
+for N_THREADS in ${THREADS_SETTINGS}; do
+    RESULT_NAME="threads_${N_THREADS}"
+    RESULT_PATH=${RESULTS_DIR}/${RESULT_NAME}
     echo " "
     echo " "
     echo "----------------------------------"
-    echo "test using ${THREADS} threads"
+    echo "test using ${N_THREADS} threads"
     echo "----------------------------------"
-    iperf3 -c 127.0.0.1 -p ${PORT} -P ${THREADS} -t ${DURATION} | tee ./results/${RESULT_NAME}
+    iperf3 -c 127.0.0.1 -p ${PORT} -P ${N_THREADS} -t ${DURATION} > ${RESULT_PATH}
     echo " "
     echo "test with ${THREADS} threads complete"
     sleep 5
-  done
 done
 
 sleep 5
@@ -33,5 +38,6 @@ echo " "
 echo "killing server at PID == ${SERVER_PID}"
 kill -9 ${SERVER_PID}
 echo " "
+echo "done"
 echo " "
 echo " "

@@ -72,8 +72,6 @@ for RT in ${ROUTER_THREADS} ; do
     
     # Start Router B --------------------------------
     systemd-run --quiet --user --scope -p CPUQuota=${CPU}% ${ROUTER} --config ./B.conf > ${RESULT_ROOT}/routers/B.log 2>&1 &
-    ROUTER_B_PID=$!
-    echo "Router B started with PID ${ROUTER_PID}"
     
     # Give plenty of time for the routers to set up the network
     sleep 10
@@ -126,14 +124,20 @@ for RT in ${ROUTER_THREADS} ; do
 done
 date
 
-echo "\n\n\n======================================="
+echo " "
+echo "======================================="
 echo "Running results post-processing"
-echo "=======================================\n\n\n"
+echo "======================================="
+echo " "
 sleep 10
 
 ./process_results.py ${ROUTER_VERSION}
 
 
-echo "\n\ndone\n\n\n"
+echo " "
+echo " "
+echo "done"
+echo " "
+echo " "
 
 
