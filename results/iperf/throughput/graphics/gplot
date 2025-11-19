@@ -1,0 +1,17 @@
+set title "Iperf3 Throughput vs Thread Count" font ",24"
+
+set   autoscale
+unset key
+
+set pointsize 2
+
+set xlabel "Iperf3 Sender Threads" font ",20"
+
+set ylabel "Throughput (Gbits/sec)" font ",20"
+set yrange [ 0 : ]
+
+set terminal jpeg size 1000, 600
+set output "graph.jpg"
+
+plot "./data" with linespoints lt rgb "red" lw 2
+

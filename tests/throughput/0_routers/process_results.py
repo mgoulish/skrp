@@ -70,8 +70,8 @@ with open ( data_file_path, 'w' ) as output :
     for iteration_value in sorted_dict[n_threads_set] :
       throughput_sum += float(iteration_value)
       count += 1
-      print ( f"sum so far: {throughput_sum}" )
     avg = throughput_sum /count
+    print ( f"avg:  {avg} ------------------------" )
     output.write ( f"{n_threads_set}   {avg:.2f}\n" )
 
 #with open ( data_file_path, 'w' ) as df :
