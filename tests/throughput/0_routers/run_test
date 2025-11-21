@@ -24,11 +24,7 @@ for ITERATION in ${ITERATIONS}; do
   for N_THREADS in ${THREADS_SETTINGS}; do
       RESULT_NAME="threads_${N_THREADS}_iteration_${ITERATION}"
       RESULT_PATH=${RESULTS_DIR}/${RESULT_NAME}
-      echo " "
-      echo " "
-      echo "----------------------------------"
-      echo "test using ${N_THREADS} threads"
-      echo "----------------------------------"
+      echo "iteration: ${ITERATION} threads: ${N_THREADS}s"
       iperf3 -c 127.0.0.1 -p ${PORT} -P ${N_THREADS} -t ${DURATION} > ${RESULT_PATH}
       echo " "
       echo "test with ${N_THREADS} threads complete"
@@ -41,6 +37,7 @@ echo " "
 echo "killing server at PID == ${SERVER_PID}"
 kill -9 ${SERVER_PID}
 echo " "
-echo "done"
+echo "done running test"
 echo " "
 echo " "
+echo "processing results..."

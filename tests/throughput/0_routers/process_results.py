@@ -61,7 +61,6 @@ for file_name in os.listdir ( results_dir ) :
 
 sorted_items = sorted(data_dict.items())
 sorted_dict = dict(sorted_items)
-#print ( sorted_dict )
 
 with open ( data_file_path, 'w' ) as output :
   for n_threads_set in sorted_dict :
@@ -71,10 +70,6 @@ with open ( data_file_path, 'w' ) as output :
       throughput_sum += float(iteration_value)
       count += 1
     avg = throughput_sum /count
-    print ( f"avg:  {avg} ------------------------" )
     output.write ( f"{n_threads_set}   {avg:.2f}\n" )
 
-#with open ( data_file_path, 'w' ) as df :
-  #for datum in sorted_dict :
-    #df.write ( f"{datum}   {sorted_dict[datum]}\n" )
-
+# Call gnuplot on the preexisting gnuplot script.
