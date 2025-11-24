@@ -1,0 +1,135 @@
+#! /bin/bash
+
+
+#----------------------------------------------------------
+# Begin user-settable parameters 
+#----------------------------------------------------------
+
+# Set this based on which version of the Router software you have installed.
+ROUTER_VERSION=3.4.1_x
+
+# And set this to which test you want to run.
+TEST=soak
+
+# How long should each test last?
+# I tried 60 seconds, and they were indistinguishable from 15 seconds
+# with respect to stability of results.
+DURATION=100
+
+# The CPU allocation for each router during the tests.
+CPU_LIMITS="200"
+
+ROUTER_THREADS="3"
+
+SENDER_THREADS="3"
+#----------------------------------------------------------
+# End user-settable parameters 
+#----------------------------------------------------------
+
+TIMESTAMP=`date +"%Y-%m-%d-%H-%M"`
+RESULTS_ROOT=../../../results/${ROUTER_VERSION}/${TEST}/${TIMESTAMP}
+TEST_RESULTS_DIR=${RESULTS_ROOT}/test_results
+echo "TEST_RESULTS_DIR == ${TEST_RESULTS_DIR}"
+
+mkdir -p ${RESULTS_ROOT}/test_results
+mkdir -p ${RESULTS_ROOT}/data
+mkdir -p ${RESULTS_ROOT}/graphs
+mkdir -p ${RESULTS_ROOT}/routers
+
+
+# Your router is installed in the standard place.
+ROUTER=/usr/local/sbin/skrouterd
+
+
+echo "Starting routers from ${ROUTER}"
+date
+
+for RT in ${ROUTER_THREADS} ; do
+  echo "==========================================================="
+  echo "Router threads ${RT} "
+  echo "==========================================================="
+  # Create the router config files
+  sed "s/N_THREADS/${RT}/"   < A.conf.template    > A.conf
+  sed "s/N_THREADS/${RT}/"   < B.conf.template    > B.conf
+
+
+  for CPU in ${CPU_LIMITS} ; do
+
+    echo "==========================================================="
+    echo "CPU ${CPU} "
+    echo "==========================================================="
+
+    # Start Router A --------------------------------
+    # I don't want to constrain memory
+    #systemd-run --quiet --user --scope -p CPUQuota=${CPU}% -p MemoryMax=4G ${ROUTER} --config ./A.conf > router.log 2>&1 &
+    systemd-run --quiet --user --scope -p CPUQuota=${CPU}% ${ROUTER} --config ./A.conf > ${RESULTS_ROOT}/routers/A.log 2>&1 &
+    echo "Router A started"
+    sleep 5
+    
+    # Start Router B --------------------------------
+    systemd-run --quiet --user --scope -p CPUQuota=${CPU}% ${ROUTER} --config ./B.conf > ${RESULTS_ROOT}/routers/B.log 2>&1 &
+    echo "Router B started"
+    
+    # Give plenty of time for the routers to set up the network
+    sleep 10
+    
+
+    
+    # Start the server. This is only done once.
+    iperf3 -s -p 5801 &
+    SERVER_PID=$!
+    echo "server started"
+    
+    
+    
+    for ST in ${SENDER_THREADS}; do
+      echo "==========================================================="
+      echo "sender threads ${ST} "
+      echo "==========================================================="
+      sleep 1
+      echo " "
+      # Run the client
+      RESULT_NAME="cpu_${CPU}_sender-threads_${ST}_router-threads_${RT}"
+      iperf3 -c 127.0.0.1 -p 5800 -P ${ST} -t ${DURATION} > ${TEST_RESULTS_DIR}/${RESULT_NAME}
+      echo " "
+      echo "threads ${THREADS} complete"
+      sleep 5
+    done
+    
+    sleep 5
+    echo " "
+    echo "killing server at PID ${SERVER_PID}"
+    kill -9 ${SERVER_PID}
+    echo "killing routers..."
+    pkill skrouterd
+    sleep 2
+    pkill skrouterd
+    sleep 2
+    echo "Any routers remaining?"
+    ps -aef | grep skrouterd | grep -v grep
+    echo " "
+    echo " "
+    echo " "
+  done
+done
+date
+
+echo " "
+echo " "
+echo "======================================="
+echo "Calling ./process_results.py ${ROUTER_VERSION} ${TIMESTAMP} ${RESULTS_ROOT}"
+echo "======================================="
+echo " "
+echo " "
+sleep 10
+
+./process_results.py ${ROUTER_VERSION} ${TIMESTAMP} ${RESULTS_ROOT}
+
+
+echo " "
+echo " "
+echo "done"
+echo " "
+echo " "
+
+
