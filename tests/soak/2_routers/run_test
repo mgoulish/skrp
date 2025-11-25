@@ -28,13 +28,14 @@ SENDER_THREADS="3"
 
 TIMESTAMP=`date +"%Y-%m-%d-%H-%M"`
 RESULTS_ROOT=../../../results/${ROUTER_VERSION}/${TEST}/${TIMESTAMP}
+echo "RESULTS_ROOT == ${RESULTS_ROOT}"
 TEST_RESULTS_DIR=${RESULTS_ROOT}/test_results
-echo "TEST_RESULTS_DIR == ${TEST_RESULTS_DIR}"
+RESOURCE_USAGE_DIR=${RESULTS_ROOT}/resource_usage
 
-mkdir -p ${RESULTS_ROOT}/test_results
-mkdir -p ${RESULTS_ROOT}/data
+mkdir -p ${TEST_RESULTS_DIR}
 mkdir -p ${RESULTS_ROOT}/graphs
 mkdir -p ${RESULTS_ROOT}/routers
+mkdir -p ${RESOURCE_USAGE_DIR}
 
 
 # Your router is installed in the standard place.
@@ -63,12 +64,16 @@ for RT in ${ROUTER_THREADS} ; do
     # I don't want to constrain memory
     #systemd-run --quiet --user --scope -p CPUQuota=${CPU}% -p MemoryMax=4G ${ROUTER} --config ./A.conf > router.log 2>&1 &
     systemd-run --quiet --user --scope -p CPUQuota=${CPU}% ${ROUTER} --config ./A.conf > ${RESULTS_ROOT}/routers/A.log 2>&1 &
-    echo "Router A started"
+    ROUTER_A_PID=$!
+    ./monitor_process.py ${ROUTER_A_PID} > ${RESOURCE_USAGE_DIR}/router_a &
+    echo "Router A started with PID ${ROUTER_A_PID}"
     sleep 5
     
     # Start Router B --------------------------------
     systemd-run --quiet --user --scope -p CPUQuota=${CPU}% ${ROUTER} --config ./B.conf > ${RESULTS_ROOT}/routers/B.log 2>&1 &
-    echo "Router B started"
+    ROUTER_B_PID=$!
+    ./monitor_process.py ${ROUTER_B_PID} > ${RESOURCE_USAGE_DIR}/router_b &
+    echo "Router B started with PID ${ROUTER_B_PID}"
     
     # Give plenty of time for the routers to set up the network
     sleep 10
