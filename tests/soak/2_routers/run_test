@@ -11,10 +11,7 @@ ROUTER_VERSION=3.4.1_x
 # And set this to which test you want to run.
 TEST=soak
 
-# How long should each test last?
-# I tried 60 seconds, and they were indistinguishable from 15 seconds
-# with respect to stability of results.
-DURATION=100
+DURATION=300
 
 # The CPU allocation for each router during the tests.
 CPU_LIMITS="200"

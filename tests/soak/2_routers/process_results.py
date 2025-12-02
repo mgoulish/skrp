@@ -33,6 +33,10 @@ GRAPH_DIR         = f"{RESULTS_ROOT}/graphs/soak"
 
 os.makedirs ( GRAPH_DIR, exist_ok = True )
 
+
+#-------------------------------------------------------------
+# Process throughput results file
+#-------------------------------------------------------------
 print ( f"looking for result in {TEST_RESULTS_DIR}" )
 
 # There should only be one file.
@@ -77,4 +81,36 @@ print ( f"Running gnuplot..." )
 subprocess.run ( ["gnuplot", gnuplot_file_path] )
 
 subprocess.run ( ["display", image_file_path] )
+
+
+#-------------------------------------------------------------
+# Process resource usage file
+#-------------------------------------------------------------
+
+RESOURCE_USAGE_DIR  = f"{RESULTS_ROOT}/resource_usage"
+
+for input_file_name in os.listdir ( RESOURCE_USAGE_DIR ) :
+  if input_file_name.endswith(".data") :
+    continue
+  input_file_path = os.path.join ( RESOURCE_USAGE_DIR, input_file_name)
+  output_file_path = input_file_path + ".data"
+  line_count = 0
+  with open ( input_file_path, 'r' ) as input_file:
+    with open ( output_file_path, 'w' ) as output_file :
+      for line in input_file:
+        line_count += 1
+        if line_count <= 3 : # The first 3 lines are header
+          continue
+        if 'terminated' in line :
+          continue
+        words = line.split()
+        if len(words) < 3 :
+          continue
+        #print ( f"line {line_count}: {words}" )
+        cpu = words [ 1 ]
+        mem = words [ 2 ]
+        output_file.write ( f"{cpu}   {mem}\n" )
+  print ( f"data output file: {output_file_path}" )
+
+
 
