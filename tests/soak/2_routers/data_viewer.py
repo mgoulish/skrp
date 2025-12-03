@@ -6,17 +6,31 @@ import sys
 
 
 
-if len(sys.argv) < 2 :
-  print ( "\nGive me data file name on the command line\n" )
+if len(sys.argv) < 3 :
+  print ( "\nGive me data file path and router version on the command line\n" )
   sys.exit ( 1 )
 
+data_file_path = sys.argv[1]
+router_version = sys.argv[2]
+
+print ( f"Here is the data file path: {data_file_path}" )
+
+
 # --------------------- Load data ---------------------
-data = np.loadtxt("router_a.data", ndmin=2)   # works for 1 or 2 columns (forces 2D array)
+data = np.loadtxt ( data_file_path, ndmin=2)   # works for 1 or 2 columns (forces 2D array)
 #data = np.loadtxt("/home/mick/skrp/results/3.4.1_x/soak/2025-11-27-22-48/graphs/soak/cpu_200_sender-threads_3_router-threads_3.data", ndmin=2)   # works for 1 or 2 columns (forces 2D array)
 n_cols = data.shape[1]
 x = np.arange(1, data.shape[0] + 1)
 y1 = data[:, 0]
 y2 = data[:, 1] if n_cols >= 2 else None
+
+
+# -------- Decide the Plot Title based on the data file path -----------------
+mode = 'throughput'
+graph_title = f"Throughput, Router Version {router_version}"
+if 'resource_usage' in data_file_path :
+  graph_title = f"Resource Usage, Router Version {router_version}"
+  mode = 'resource'
 
 # --------------------- Create figure ---------------------
 fig, ax1 = plt.subplots(figsize=(12, 7))
@@ -49,10 +63,19 @@ manager.window.move(int((screen_width - desired_width) / 2),
 
 
 # Always plot the left (red) series
-ax1.plot(x, y1, color='red', lw=1.5, label="Column 1 (red - left axis)")
+if mode == 'throughput' :
+  ax1.plot(x, y1, color='red', lw=1.5, label="Throughput")
+else : 
+  ax1.plot(x, y1, color='red', lw=1.5, label="CPU")
+  
 
 ax1.set_xlabel("Index", fontsize=24, color="#808080")
-ax1.set_ylabel("Column 1 (left axis)", fontsize=28, color="red")
+
+if mode == 'throughput' :
+  ax1.set_ylabel("Throughput (Gbits/sec)", fontsize=28, color="red")
+else :
+  ax1.set_ylabel("CPU (%)", fontsize=28, color="red")
+  
 ax1.tick_params(axis='x', labelcolor="#808080", labelsize=16)
 ax1.tick_params(axis='y', labelcolor="red", labelsize=20)
 
@@ -66,14 +89,15 @@ ax1.spines['right'].set_visible(False)
 
 # Right (blue) axis only if we actually have a second column
 ax2 = None
-if y2 is not None:
+if y2 is not None:   # This means we are viewing Resource Usage data.
     ax2 = ax1.twinx()
-    ax2.plot(x, y2, color='blue', lw=1.5, label="Column 2 (blue - right axis)")
-    ax2.set_ylabel("Column 2 (right axis)", fontsize=28, color="blue")
+    ax2.plot(x, y2, color='blue', lw=1.5, label="Memory")
+    ax2.set_ylabel("Memory (megabytes)", fontsize=28, color="blue")
     ax2.tick_params(axis='y', labelcolor="blue", labelsize=20)
     ax2.spines['right'].set_color("blue")
     ax2.spines['right'].set_linewidth(2)
     ax2.spines['right'].set_visible(True)
+
 
 # Legend (auto-combines if dual)
 handles, labels = ax1.get_legend_handles_labels()
@@ -83,13 +107,15 @@ if ax2 is not None:
     labels += l2
 ax1.legend(handles, labels, loc='upper left', fontsize=16)
 
-plt.title("Interactive plot (1 or 2 columns)", fontsize=20, pad=20)
-plt.tight_layout()
+plt.title ( graph_title, fontsize = 20, pad = 20 )
+plt.tight_layout ( )
 
-# Store the exact original view so 'h' can restore it perfectly
+
+# Store the original view so the 'h' can restore it.
 initial_xlim = ax1.get_xlim()
 initial_ylim1 = ax1.get_ylim()
 initial_ylim2 = ax2.get_ylim() if ax2 is not None else None
+
 
 # --------------------- Hover tooltip + crosshair ---------------------
 vline = ax1.axvline(color='gray', lw=1.2, ls='--', alpha=0.8, visible=False)
