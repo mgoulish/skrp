@@ -4,7 +4,69 @@ import os
 import shutil
 import sys
 import subprocess
+import math
+import matplotlib.pyplot as plt
 
+
+
+
+
+#-----------------------------------------------------------------------------------
+# Augmented Dickey-Fuller test  ( null = non-stationary / trend exists)
+# Schwert  ( 2002) max lag length — the most commonly used rule for large samples
+#-----------------------------------------------------------------------------------
+import numpy as np
+from statsmodels.tsa.stattools import adfuller
+
+def augmented_dickie_fuller_test ( filename ) :
+  data = np.loadtxt ( filename )
+  n = len(data)
+
+  print ( '-----------------------------------------------' )
+  print ( "Augmented Dickey-Fuller Test " )
+  print ( '-----------------------------------------------' )
+  print ( "   ( This will take a few seconds... )" )
+  maxlag = math.floor (12 *  (n / 100) ** (1 / 4))
+  adf_result = adfuller ( data, maxlag=maxlag, autolag=None, regression='c')
+  print ( "  ADF statistic :", adf_result[0] )
+  print ( "  p-value       :",  adf_result[1] )
+  print ( "  Used lag      :",  adf_result[2] )
+  print ( '' )
+
+
+
+#--------------------------------------------
+# Large-window rolling mean
+# Draw an image of the data with the rolling mean in red, superimposed.
+#--------------------------------------------
+def rolling_mean ( filename ) :
+  data = np.loadtxt ( filename )
+
+  #---------------------------------------------------
+  # Basic Statistics
+  #---------------------------------------------------
+  n = len(data)
+
+  window = n // 50          # ≈2% of data, catches very slow drifts
+  rolling = np.convolve ( data, np.ones ( window)/window, mode='valid')
+  
+  print ( '-------------------------------------------------------' )
+  print ( f" Making Rolling Mean with window == {window:,}" )
+  print ( '-------------------------------------------------------' )
+  
+  rolling_mean_file_path = 'rolling_mean_plot.png'
+  plt.figure ( figsize= ( 12, 6))
+  plt.plot ( data, color='lightgray', alpha=0.7, label='Raw data')
+  plt.plot ( np.arange ( window-1, n), rolling, color='red', linewidth=2, label=f'Rolling mean  ( window={window:,})')
+  plt.ylabel ( 'Measurement')
+  plt.title ( 'Data + rolling mean')
+  plt.legend ( )
+  plt.savefig ( rolling_mean_file_path, dpi=300, bbox_inches='tight')  # saves to file
+  plt.close ( )
+  print ( f"  rolling mean plot written to {rolling_mean_file_path}" )
+  print ( '\n\n' )
+  subprocess.Popen ( ["display", rolling_mean_file_path] )    # Don't wait for completion
+  
 
 #==================================================
 # main 
@@ -78,10 +140,12 @@ with open ( gnuplot_file_path, "w" ) as gplot_file :
 
 
 print ( f"Running gnuplot..." )
-subprocess.run ( ["gnuplot", gnuplot_file_path] )
+subprocess.run   ( ["gnuplot", gnuplot_file_path] )  # Wait for completion
+subprocess.Popen ( ["display", image_file_path] )    # Don't wait for completion
 
-subprocess.run ( ["display", image_file_path] )
+augmented_dickie_fuller_test ( data_file_path )
 
+rolling_mean ( data_file_path )
 
 #-------------------------------------------------------------
 # Process resource usage file
