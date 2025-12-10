@@ -231,6 +231,7 @@ for input_file_name in os.listdir ( RESOURCE_USAGE_DIR ) :
     gsf.write ( f'set xlabel "Time (seconds)" font sprintf("arial,%d", xlabel_font_size)\n' )
     gsf.write ( f'plot datafile using (interval * $0):1 with lines lw 2.5 lc rgb "#cc0000" title "CPU Usage (%)"  axes x1y1, \\\n' )
     gsf.write ( f'     \'\' using (interval * $0):2 with lines lw 2.5 lc rgb "#0066cc" title "Memory Usage (MB)" axes x1y2\n' )
+    gsf.close()
 
     print ( f"Running gnuplot with this command: gnuplot {gnuplot_script_file_path} " )
     try : 
