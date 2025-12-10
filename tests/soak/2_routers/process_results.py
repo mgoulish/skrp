@@ -231,21 +231,22 @@ for input_file_name in os.listdir ( RESOURCE_USAGE_DIR ) :
     gsf.write ( f'set xlabel "Time (seconds)" font sprintf("arial,%d", xlabel_font_size)\n' )
     gsf.write ( f'plot datafile using (interval * $0):1 with lines lw 2.5 lc rgb "#cc0000" title "CPU Usage (%)"  axes x1y1, \\\n' )
     gsf.write ( f'     \'\' using (interval * $0):2 with lines lw 2.5 lc rgb "#0066cc" title "Memory Usage (MB)" axes x1y2\n' )
-    gsf.close()
 
-    print ( f"Running gnuplot with this command: gnuplot {gnuplot_script_file_path} " )
-    try : 
-      result = subprocess.run ( ["gnuplot", gnuplot_script_file_path] )  # Wait for completion
-      print("gnuplot result stdout:", result.stdout)
-      print("gnuplot result stderr:", result.stderr)
-    except subprocess.CalledProcessError as e :
-      print("Command failed with error:", e)
-      print("Stderr:", e.stderr)
+  # Run gnuplot on the script created above, then display the resulting image
+  print ( f"Running gnuplot with this command: gnuplot {gnuplot_script_file_path} " )
+  try : 
+    result = subprocess.run ( ["gnuplot", gnuplot_script_file_path] )  # Wait for completion
+    print("gnuplot result stdout:", result.stdout)
+    print("gnuplot result stderr:", result.stderr)
+  except subprocess.CalledProcessError as e :
+    print("Command failed with error:", e)
+    print("Stderr:", e.stderr)
 
-    # Did gnuplot create the expected jpg file?
-    if not os.path.exists ( gnuplot_output_image_path ) :
-      print ( f"{gnuplot_output_image_path} was not created" )
-      sys.exit ( 1 )
-    print ( f"Displaying {gnuplot_output_image_path}" )
-    subprocess.Popen ( ["display", gnuplot_output_image_path] )    # Don't wait for completion
+  # Did gnuplot create the expected jpg file?
+  if not os.path.exists ( gnuplot_output_image_path ) :
+    print ( f"{gnuplot_output_image_path} was not created" )
+    sys.exit ( 1 )
+  print ( f"Displaying {gnuplot_output_image_path}" )
+  subprocess.Popen ( ["display", gnuplot_output_image_path] )    # Don't wait for completion
+
 
