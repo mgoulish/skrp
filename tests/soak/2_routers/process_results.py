@@ -31,6 +31,14 @@ def augmented_dickie_fuller_test ( filename ) :
   print ( "  ADF statistic :", adf_result[0] )
   print ( "  p-value       :",  adf_result[1] )
   print ( "  Used lag      :",  adf_result[2] )
+  print ( "" )
+  print ( "   statistic value    |   probability of false negative" )
+  print ( "  --------------------+-----------------------------------" )
+  print ( "        -3.43         |             0.01                  " )
+  print ( "        -3.90         |             0.001                 " )
+  print ( "        -4.17         |             0.0001                " )
+  print ( "  --------------------+-----------------------------------" )
+  print (f"    our score:   {adf_result[0]:.2f}" )
   print ( '' )
 
 
@@ -39,7 +47,9 @@ def augmented_dickie_fuller_test ( filename ) :
 # Large-window rolling mean
 # Draw an image of the data with the rolling mean in red, superimposed.
 #--------------------------------------------
-def rolling_mean ( filename ) :
+def rolling_mean ( filename, results_root, timestamp ) :
+
+  output_dir = f"{results_root}/graphs"
   data = np.loadtxt ( filename )
 
   #---------------------------------------------------
@@ -54,12 +64,12 @@ def rolling_mean ( filename ) :
   print ( f" Making Rolling Mean with window == {window:,}" )
   print ( '-------------------------------------------------------' )
   
-  rolling_mean_file_path = 'rolling_mean_plot.png'
+  rolling_mean_file_path = f"{output_dir}/rolling_mean_plot.png"
   plt.figure ( figsize= ( 12, 6))
   plt.plot ( data, color='lightgray', alpha=0.7, label='Raw data')
   plt.plot ( np.arange ( window-1, n), rolling, color='red', linewidth=2, label=f'Rolling mean  ( window={window:,})')
   plt.ylabel ( 'Measurement')
-  plt.title ( 'Data + rolling mean')
+  plt.title ( 'Throughput + Rolling Mean ' + timestamp)
   plt.legend ( )
   plt.savefig ( rolling_mean_file_path, dpi=300, bbox_inches='tight')  # saves to file
   plt.close ( )
@@ -128,7 +138,7 @@ image_file_path   = f"{GRAPH_DIR}/{file_name}.jpg"
 
 print ( f"Writing gnuplot script to {gnuplot_file_path}" )
 with open ( gnuplot_file_path, "w" ) as gplot_file :
-  gplot_file.write ( f'set title "Soak Test {TIMESTAMP}" font ",30"\n' )
+  gplot_file.write ( f'set title "Soak Test Throughput {TIMESTAMP}" font ",30"\n' )
   gplot_file.write ( f'set   autoscale\n' )
   gplot_file.write ( f'unset key\n' )
   gplot_file.write ( f'set xlabel "Time (seconds)" font ",24"\n' )
@@ -145,21 +155,30 @@ subprocess.Popen ( ["display", image_file_path] )    # Don't wait for completion
 
 augmented_dickie_fuller_test ( data_file_path )
 
-rolling_mean ( data_file_path )
+rolling_mean ( data_file_path, RESULTS_ROOT, TIMESTAMP )
 
 #-------------------------------------------------------------
 # Process resource usage file
 #-------------------------------------------------------------
 
 RESOURCE_USAGE_DIR  = f"{RESULTS_ROOT}/resource_usage"
+print ( f"processing resource usage data in dir {RESOURCE_USAGE_DIR}" )
+
+# Remove all the files that I put there on a previous run
+for input_file_name in os.listdir ( RESOURCE_USAGE_DIR ) :
+  if input_file_name.endswith(".data")  or  \
+     input_file_name.endswith(".gplot") or  \
+     input_file_name.endswith(".jpg") :
+    os.remove ( f'{RESOURCE_USAGE_DIR}/{input_file_name}' )
+
 
 for input_file_name in os.listdir ( RESOURCE_USAGE_DIR ) :
-  if input_file_name.endswith(".data") :
-    continue
+  router_name = input_file_name.split('_')[1].capitalize()
   input_file_path = os.path.join ( RESOURCE_USAGE_DIR, input_file_name)
   output_file_path = input_file_path + ".data"
   line_count = 0
   with open ( input_file_path, 'r' ) as input_file:
+    print ( f"input file: {input_file_path}" )
     with open ( output_file_path, 'w' ) as output_file :
       for line in input_file:
         line_count += 1
@@ -174,7 +193,58 @@ for input_file_name in os.listdir ( RESOURCE_USAGE_DIR ) :
         cpu = words [ 1 ]
         mem = words [ 2 ]
         output_file.write ( f"{cpu}   {mem}\n" )
-  print ( f"data output file: {output_file_path}" )
+  if os.path.exists(output_file_path):
+    print(f"'{output_file_path}' was created.")
+  else:
+    print(f"'{file_path}' was not created.")
+    sys.exit(1)
+  gnuplot_script_file_name = f"{input_file_name}.gplot"
+  gnuplot_script_file_path = f"{RESOURCE_USAGE_DIR}/{gnuplot_script_file_name}"
+  print ( f"gnuplot script file path: {gnuplot_script_file_path}" )
 
+  gnuplot_output_image_path = f"{RESOURCE_USAGE_DIR}/router_{router_name}_resource_usage.jpg"
+  print ( f"gunplot output image path: {gnuplot_output_image_path}" )
 
+  # Make the gnuplot script for resource usage
+  with open ( gnuplot_script_file_path, "w" ) as gsf :   # gnuplot script file 
+    gsf.write ( f'set title "Router {router_name} CPU and Memory Usage : {TIMESTAMP}"  font ",30"\n' )
+    gsf.write ( f'datafile ="{output_file_path}"\n' )
+    # Step by 5 on X axis because the monitoring program
+    # takes a sample every 5 seconds.
+    gsf.write ( 'interval = 5\n' ) 
+    gsf.write ( 'set terminal jpeg size 2000, 1000\n' )
+    gsf.write ( f'set output "{gnuplot_output_image_path}"\n' )
+    gsf.write ( 'unset border\n' )
+    gsf.write ( f'unset key\n' )
+    gsf.write ( f'set arrow 1 from graph 0,0 to graph 0,1 nohead lc rgb "#cc0000" lw 2\n' )
+    gsf.write ( f'set arrow 2 from graph 1,0 to graph 1,1 nohead lc rgb "#0066cc" lw 2\n' )
+    gsf.write ( f'set arrow 3 from graph 0,0 to graph 1,0 nohead lc rgb "black"   lw 1.5\n' )
+    gsf.write ( f'set grid ytics y2tics back lc rgb "gray" lw 1\n' )
+    gsf.write ( f'set xrange [0:*]\n' )
+    gsf.write ( f'label_font_size   = 24  \n' )
+    gsf.write ( f'tic_font_size     = 16  \n' )
+    gsf.write ( f'xlabel_font_size  = 24  \n' )
+    gsf.write ( f'set ylabel "CPU Usage (%)" font sprintf("arial,%d", label_font_size) textcolor rgb "#cc0000" offset 1.5,0\n' )
+    gsf.write ( f'set y2label "Memory Usage (MB)" font sprintf("arial,%d", label_font_size) textcolor rgb "#0066cc" offset 2,0\n' )
+    gsf.write ( f'set ytics  font sprintf("arial,%d", tic_font_size)   nomirror textcolor rgb "#cc0000"\n' )
+    gsf.write ( f'set y2tics font sprintf("arial,%d", tic_font_size)   nomirror textcolor rgb "#0066cc"\n' )
+    gsf.write ( f'set xlabel "Time (seconds)" font sprintf("arial,%d", xlabel_font_size)\n' )
+    gsf.write ( f'plot datafile using (interval * $0):1 with lines lw 2.5 lc rgb "#cc0000" title "CPU Usage (%)"  axes x1y1, \\\n' )
+    gsf.write ( f'     \'\' using (interval * $0):2 with lines lw 2.5 lc rgb "#0066cc" title "Memory Usage (MB)" axes x1y2\n' )
+
+    print ( f"Running gnuplot with this command: gnuplot {gnuplot_script_file_path} " )
+    try : 
+      result = subprocess.run ( ["gnuplot", gnuplot_script_file_path] )  # Wait for completion
+      print("gnuplot result stdout:", result.stdout)
+      print("gnuplot result stderr:", result.stderr)
+    except subprocess.CalledProcessError as e :
+      print("Command failed with error:", e)
+      print("Stderr:", e.stderr)
+
+    # Did gnuplot create the expected jpg file?
+    if not os.path.exists ( gnuplot_output_image_path ) :
+      print ( f"{gnuplot_output_image_path} was not created" )
+      sys.exit ( 1 )
+    print ( f"Displaying {gnuplot_output_image_path}" )
+    subprocess.Popen ( ["display", gnuplot_output_image_path] )    # Don't wait for completion
 
