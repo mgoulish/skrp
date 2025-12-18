@@ -145,7 +145,7 @@ with open ( gnuplot_file_path, "w" ) as gplot_file :
   gplot_file.write ( f'set ylabel "Throughput (Gbits/sec)" font ",24"\n' )
   gplot_file.write ( f'set yrange [0:]\n' )
   gplot_file.write ( f'set terminal jpeg size 2000, 500\n' )
-  gplot_file.write ( f'set output "./{image_file_path}"\n' )
+  gplot_file.write ( f'set output "{image_file_path}"\n' )
   gplot_file.write ( f'plot "{data_file_path}"  with linespoints lt rgb "red" lw 3\n' )
 
 

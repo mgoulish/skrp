@@ -101,7 +101,7 @@ for RT in ${ROUTER_THREADS} ; do
         # Run the client
         iperf3 -c 127.0.0.1 -p 5800 -P ${ST} -t ${DURATION} > ${TEST_RESULTS_DIR}/${RESULT_NAME}
         echo " "
-        echo "threads ${THREADS} iteration ${ITERATION} complete"
+        echo "router threads ${RT} sender threads ${ST} iteration ${ITERATION} complete"
         sleep 5
       done
     done

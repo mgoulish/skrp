@@ -113,7 +113,8 @@ for file_name in os.listdir ( TEST_RESULTS_DIR ) :
      name_components[2] != 'sender-threads' or \
      name_components[4] != 'router-threads' or \
      name_components[6] != 'iteration' :
-    print ( f"error parsing file name: {file_name}" )
+    print ( f"error parsing file name: {TEST_RESULTS_DIR}/{file_name}" )
+    print ( f"name components: {name_components}" )
     sys.exit(1)
 
   cpu_val             = name_components[1]
