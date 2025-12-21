@@ -4,38 +4,40 @@ import os
 import subprocess
 import time
 import datetime
+import argparse
+from datetime import datetime
 
-#----------------------------------------------------------
-# Begin user-settable parameters 
-#----------------------------------------------------------
+def parse_list(arg):
+    return arg.split(',')
 
-# Set this based on which version of the Router software you have installed.
-ROUTER_VERSION = "3.4.1_test"
+parser = argparse.ArgumentParser(description="Run throughput tests with configurable parameters.")
 
-# And set this to which test you want to run.
-TEST = "throughput"
+# User-settable parameters as command-line arguments
+parser.add_argument('--router-version', default="3.4.1", help="Version of the Router software installed.")
+parser.add_argument('--test', default="throughput", help="Which test to run.")
+parser.add_argument('--duration', type=int, default=15, help="Duration of each test in seconds.")
+parser.add_argument('--iterations', type=parse_list, default="1,2,3", help="List of iterations, comma-separated.")
+parser.add_argument('--cpu-limits', type=parse_list, default="500,400,300,200,100,50,25", help="CPU allocations for each router, comma-separated.")
+parser.add_argument('--router-threads', type=parse_list, default="1,2,4,5,7,10", help="Router threads, comma-separated.")
+parser.add_argument('--sender-threads', type=parse_list, default="1,2,5,10", help="Sender threads, comma-separated.")
 
-# How long should each test last?
-# I tried 60 seconds, and they were indistinguishable from 15 seconds
-# with respect to stability of results.
-DURATION = 15
+args = parser.parse_args()
 
-# Each graphed result will the the average of several identically 
-# configured tests, the number controlled by this variable.
-ITERATIONS = ["1", "2", "3"]
 
-# The CPU allocation for each router during the tests.
-CPU_LIMITS = ["500", "400", "300", "200", "100", "50", "25"]
+# Assign parsed arguments to variables
+ROUTER_VERSION = args.router_version
+TEST = args.test
+DURATION = args.duration
+ITERATIONS = args.iterations
+CPU_LIMITS = args.cpu_limits
+ROUTER_THREADS = args.router_threads
+SENDER_THREADS = args.sender_threads
 
-ROUTER_THREADS = ["1", "2", "4", "5", "7", "10"]
+n_tests = len(ITERATIONS) * len(CPU_LIMITS) * len(ROUTER_THREADS) * len(SENDER_THREADS)
 
-SENDER_THREADS = ["1", "2", "5", "10"]
-#----------------------------------------------------------
-# End user-settable parameters 
-#----------------------------------------------------------
-
-RESULT_ROOT = f"../../../results/{ROUTER_VERSION}/{TEST}"
-TEST_RESULTS_DIR = f"../../../results/{ROUTER_VERSION}/{TEST}/test_results"
+TIMESTAMP = datetime.now().strftime("%Y-%m-%d-%H-%M")
+RESULT_ROOT = f"../../../results/{ROUTER_VERSION}/{TEST}/{TIMESTAMP}"
+TEST_RESULTS_DIR = f"{RESULT_ROOT}/test_results"
 print(f"TEST_RESULTS_DIR == {TEST_RESULTS_DIR}")
 
 os.makedirs(f"{RESULT_ROOT}/test_results", exist_ok=True)
@@ -47,12 +49,11 @@ os.makedirs(f"{RESULT_ROOT}/routers", exist_ok=True)
 ROUTER = "/usr/local/sbin/skrouterd"
 
 print(f"Starting routers from {ROUTER}")
-print(datetime.datetime.now())
+print(datetime.now())
+
+test_count = 0
 
 for RT in ROUTER_THREADS:
-    print("===========================================================")
-    print(f"Router threads {RT} ")
-    print("===========================================================")
     # Create the router config files
     with open("A.conf.template", "r") as f:
         content = f.read()
@@ -65,9 +66,6 @@ for RT in ROUTER_THREADS:
         f.write(content.replace("N_THREADS", RT))
 
     for CPU in CPU_LIMITS:
-        print("===========================================================")
-        print(f"CPU {CPU} ")
-        print("===========================================================")
 
         # Start Router A --------------------------------
         # I don't want to constrain memory
@@ -98,9 +96,6 @@ for RT in ROUTER_THREADS:
         print("server started")
         
         for ST in SENDER_THREADS:
-            print("===========================================================")
-            print(f"sender threads {ST} ")
-            print("===========================================================")
             time.sleep(1)
             for ITERATION in ITERATIONS:
                 print(" ")
@@ -118,7 +113,8 @@ for RT in ROUTER_THREADS:
                 with open(f"{TEST_RESULTS_DIR}/{RESULT_NAME}", "w") as result_file:
                     subprocess.run(cmd_client, stdout=result_file, check=True)
                 print(" ")
-                print(f"router threads {RT} sender threads {ST} iteration {ITERATION} complete")
+                test_count += 1
+                print(f"test {test_count} of {n_tests} complete")
                 time.sleep(5)
         
         time.sleep(5)
@@ -142,7 +138,7 @@ for RT in ROUTER_THREADS:
         print(" ")
         print(" ")
 
-print(datetime.datetime.now())
+print(datetime.now())
 
 print(" ")
 print("=======================================")
@@ -151,7 +147,8 @@ print("=======================================")
 print(" ")
 time.sleep(10)
 
-subprocess.run(["./process_results.py", ROUTER_VERSION])
+print ( f"Calling ./process_results.py {ROUTER_VERSION} {TIMESTAMP}" )
+subprocess.run(["./process_results.py", ROUTER_VERSION, TIMESTAMP])
 
 print(" ")
 print(" ")

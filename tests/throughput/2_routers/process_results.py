@@ -85,8 +85,9 @@ if not shutil.which ( "display" ) :
 
 
 ROUTER_VERSION    = sys.argv[1]
+TIMESTAMP         = sys.argv[2]
 TEST              = 'throughput'
-RESULTS_ROOT      = f"../../../results/{ROUTER_VERSION}/{TEST}"
+RESULTS_ROOT      = f"../../../results/{ROUTER_VERSION}/{TEST}/{TIMESTAMP}"
 TEST_RESULTS_DIR  = f"{RESULTS_ROOT}/test_results"
 GRAPH_DIR         = f"{RESULTS_ROOT}/graphs"
 
@@ -148,6 +149,7 @@ for cpu_value in CPUs :
 # Now go through all the files again to read
 # the throughput values.  This is the payload.
 for file_name in os.listdir ( TEST_RESULTS_DIR ) :
+  print ( f"reading throughput values for {TEST_RESULTS_DIR}/{file_name}" )
   file_path = os.path.join ( TEST_RESULTS_DIR, file_name )
   name_components = file_name.split('_')
   # No need to confirm that file name is well-formed,
@@ -168,6 +170,7 @@ for file_name in os.listdir ( TEST_RESULTS_DIR ) :
       print ( f"error: unknown units:{units} in file {file_name}" )
       sys.exit ( 1 )
   
+  print ( f"  throughput is {throughput}" )
   CPUs[cpu_val][sender_threads_val][router_threads_val][iteration_val]['throughput'] = throughput
   CPUs[cpu_val][sender_threads_val][router_threads_val][iteration_val]['units']      = units
 
@@ -187,7 +190,11 @@ for cpu_val in CPUs :
       iteration_dict = router_threads_dict[router_threads_val]
       for iteration_val in iteration_dict:
         test_result_dict = iteration_dict[iteration_val]
-        throughput_sum += test_result_dict [ 'throughput' ]
+        if None == test_result_dict [ 'throughput' ] :
+          print ( f"None value at cpu {cpu_val} sender_threads {sender_threads_val} router_threads {router_threads_val} iteration {iteration_val}" )
+          sys.exit(1)
+        else :
+          throughput_sum += test_result_dict [ 'throughput' ]
       throughput_avg = throughput_sum / len(iteration_dict)
       # It's a little icky to change the iteraton dict like
       # this, and overload it to store the average across iterations. 
@@ -215,9 +222,6 @@ for cpu_val in CPUs :
 # There are no explicit Y values. Those are encoded implicitly
 # as the row numbers, where the top row will be at the top of the
 # graph.
-# There are also no explicit X values. Those are encoded implicitly
-# as the positions of each value in its line.
-# The numbers in the data file are just the throughput values.
 
 for cpu_val in CPUs :
   gnuplot_script_file_path =   f"{GRAPH_DIR}/cpu_{cpu_val}.gplot"
