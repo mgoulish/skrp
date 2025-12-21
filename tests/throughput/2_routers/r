@@ -1,0 +1,9 @@
+#! /bin/bash
+
+# Short test
+#./run_test.py --cpu-limits "200,100,50" --router-threads  "1,2,4"  --sender-threads "1,2,4"
+
+# Full test
+./run_test.py --cpu-limits "500,400,300,200,100,50,25" --router-threads  "1,2,4,5,7,10"  --sender-threads "1,2,5,10"
+
+

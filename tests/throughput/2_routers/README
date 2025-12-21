@@ -1,31 +1,34 @@
 
 
-First, do ./run_test   .
+Do ./r to run the test.
 
-No, wait.
+Look at the ./r script to see a shorter version,
+commented out.
 
-First *look* at ./run_test and see if you want 
-to change and of the user-settable parameters 
-at the top.
 
 It will run a whole bunch of tests with 
 different settings for:
 
    * number of parallel iperf sender threads
 
+   * number of router threads
+
    * amount of CPU allocated to each router
 
 And it will run each test several times and
-when you process the results those iterations
+when it processes the results those iterations
 will be averaged.
 
 
+When the test is done, it will run ./process_results
 
-When the test is done, you run ./process_results
+The process_results program will produce a graph showing 
+how throughput varied across different number of threads 
+and different CPU allocations.
 
-It will produce a graph showing how throughput 
-varied across different number of threads and
-diffrent CPU allocations.
+You need gnuplot and some ffmpeg tools installed.
+run_test.py will let you know if it can't find the programs 
+it needs.
 
 
-./run_process_results uses ./process_results.py 
+
