@@ -1,10 +1,31 @@
 
+--------------------------------------------------
+What Is This Test?
+--------------------------------------------------
+Two-router network with iperf3 sender and receiver.
+The test has many separate runs to measure throughput
+with different numbers of router threads, sender 
+threads, and routerCPU allocation.
 
-Do ./r to run the test.
+At the end, a result graph is presented for each
+CPU allocation, showing routher threads on the X-axis
+and sender threads on the Y-axis.
+
+
+
+--------------------------------------------------
+How to run it
+--------------------------------------------------
+Do ./r in this directory to run the test.
 
 Look at the ./r script to see a shorter version,
 commented out.
 
+
+
+--------------------------------------------------
+What it Does
+--------------------------------------------------
 
 It will run a whole bunch of tests with 
 different settings for:
@@ -19,16 +40,20 @@ And it will run each test several times and
 when it processes the results those iterations
 will be averaged.
 
-
 When the test is done, it will run ./process_results
 
 The process_results program will produce a graph showing 
 how throughput varied across different number of threads 
 and different CPU allocations.
 
+
+
+--------------------------------------------------
+System Requirements
+--------------------------------------------------
 You need gnuplot and some ffmpeg tools installed.
-run_test.py will let you know if it can't find the programs 
-it needs.
+run_test.py will let you know if it can't find the 
+programs it needs.
 
 
 
