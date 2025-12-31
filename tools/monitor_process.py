@@ -23,7 +23,7 @@ def monitor ( pid ) :
       memory_rss_mb  = memory_info.rss / 1024 / 1024    # Show Resident Set Size in MB
       memory_percent = proc.memory_percent()
 
-      print(f"{elapsed:11d}   {cpu_percent:6.2f}   {memory_rss_mb:8.2f}   {memory_percent:8.2f}")
+      print(f"{elapsed:11d}   {cpu_percent:6.2f}   {memory_rss_mb:8.2f}   {memory_percent:8.2f}", flush=True)
 
   except psutil.NoSuchProcess:
     print("\nProcess has terminated.")

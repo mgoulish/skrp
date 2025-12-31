@@ -164,14 +164,6 @@ rolling_mean ( data_file_path, RESULTS_ROOT, TIMESTAMP )
 RESOURCE_USAGE_DIR  = f"{RESULTS_ROOT}/resource_usage"
 print ( f"processing resource usage data in dir {RESOURCE_USAGE_DIR}" )
 
-# Remove all the files that I put there on a previous run
-for input_file_name in os.listdir ( RESOURCE_USAGE_DIR ) :
-  if input_file_name.endswith(".data")  or  \
-     input_file_name.endswith(".gplot") or  \
-     input_file_name.endswith(".jpg") :
-    os.remove ( f'{RESOURCE_USAGE_DIR}/{input_file_name}' )
-
-
 for input_file_name in os.listdir ( RESOURCE_USAGE_DIR ) :
   router_name = input_file_name.split('_')[1].capitalize()
   input_file_path = os.path.join ( RESOURCE_USAGE_DIR, input_file_name)
@@ -193,17 +185,11 @@ for input_file_name in os.listdir ( RESOURCE_USAGE_DIR ) :
         cpu = words [ 1 ]
         mem = words [ 2 ]
         output_file.write ( f"{cpu}   {mem}\n" )
-  if os.path.exists(output_file_path):
-    print(f"'{output_file_path}' was created.")
-  else:
-    print(f"'{file_path}' was not created.")
-    sys.exit(1)
+
   gnuplot_script_file_name = f"{input_file_name}.gplot"
   gnuplot_script_file_path = f"{RESOURCE_USAGE_DIR}/{gnuplot_script_file_name}"
-  print ( f"gnuplot script file path: {gnuplot_script_file_path}" )
 
   gnuplot_output_image_path = f"{RESOURCE_USAGE_DIR}/router_{router_name}_resource_usage.jpg"
-  print ( f"gunplot output image path: {gnuplot_output_image_path}" )
 
   # Make the gnuplot script for resource usage
   with open ( gnuplot_script_file_path, "w" ) as gsf :   # gnuplot script file 
@@ -211,7 +197,7 @@ for input_file_name in os.listdir ( RESOURCE_USAGE_DIR ) :
     gsf.write ( f'datafile ="{output_file_path}"\n' )
     # Step by 5 on X axis because the monitoring program
     # takes a sample every 5 seconds.
-    gsf.write ( 'interval = 5\n' ) 
+    gsf.write ( 'interval = 5\n' )    # TODO   tripwire
     gsf.write ( 'set terminal jpeg size 2000, 1000\n' )
     gsf.write ( f'set output "{gnuplot_output_image_path}"\n' )
     gsf.write ( 'unset border\n' )
