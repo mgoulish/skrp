@@ -1,10 +1,10 @@
 #! /bin/bash
 
-TEST=../../../tools/throughput_test.py
+TEST=../../../tools/run_test.py
 
 
 # Short test
-${TEST} --cpu-limits "200,100,50" --router-threads  "1,2"  --sender-threads "1,2"
+${TEST} --test "throughput" --router-version "3.4.1"  --cpu-limits "200,100,50" --router-threads  "1,2,4"  --sender-threads "1,2,4" --iterations "1,2,3"
 
 # Full test
 #${TEST} --cpu-limits "500,400,300,200,100,50,25" --router-threads  "1,2,4,5,7,10"  --sender-threads "1,2,5,10"

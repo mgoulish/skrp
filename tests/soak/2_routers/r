@@ -1,0 +1,10 @@
+#! /bin/bash
+
+TEST=../../../tools/run_test.py
+
+
+# Short test
+${TEST} --test "soak" --router-version "3.4.1" --router-threads  "5"  --sender-threads "5" --duration "300" --iterations "1" --cpu-limits "500" 
+
+
+

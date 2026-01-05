@@ -29,7 +29,9 @@ def parse_list(arg):
 
 parser = argparse.ArgumentParser(description="Run router tests with configurable parameters.")
 
-# User-settable parameters as command-line arguments
+#------------------------------------------------
+# Default to a full-sized throughput test
+#------------------------------------------------
 parser.add_argument('--test',                            default="throughput",                help="Which test to run.")
 parser.add_argument('--router-version',                  default="3.4.1",                     help="Version of the Router software installed.")
 parser.add_argument('--router-threads', type=parse_list, default="1,2,4,5,7,10",              help="Router threads, comma-separated.")
