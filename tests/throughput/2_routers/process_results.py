@@ -86,8 +86,9 @@ if not shutil.which ( "display" ) :
 
 ROUTER_VERSION    = sys.argv[1]
 TIMESTAMP         = sys.argv[2]
+RESULTS_ROOT      = sys.argv[3]
+
 TEST              = 'throughput'
-RESULTS_ROOT      = f"../../../results/{ROUTER_VERSION}/{TEST}/{TIMESTAMP}"
 TEST_RESULTS_DIR  = f"{RESULTS_ROOT}/test_results"
 GRAPH_DIR         = f"{RESULTS_ROOT}/graphs"
 

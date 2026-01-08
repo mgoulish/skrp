@@ -2,9 +2,10 @@
 
 TEST=../../../tools/run_test.py
 
+pkill skrouterd
 
-# Short test
-${TEST} --test "soak" --router-version "3.4.1" --router-threads  "5"  --sender-threads "5" --duration "300" --iterations "1" --cpu-limits "500" 
+${TEST} --test "short_soak"
+#${TEST} --test "soak"
 
 
 

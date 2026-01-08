@@ -4,9 +4,9 @@ TEST=../../../tools/run_test.py
 
 
 # Short test
-${TEST} --test "throughput" --router-version "3.4.1"  --cpu-limits "200,100,50" --router-threads  "1,2,4"  --sender-threads "1,2,4" --iterations "1,2,3"
+${TEST} --test "short_throughput"
 
 # Full test
-#${TEST} --cpu-limits "500,400,300,200,100,50,25" --router-threads  "1,2,4,5,7,10"  --sender-threads "1,2,5,10"
+#${TEST} --test "throughput"
 
 
