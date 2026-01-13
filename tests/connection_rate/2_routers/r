@@ -1,0 +1,21 @@
+#! /bin/bash
+
+#./server.py 5806 &
+
+#sleep 3
+
+#./client.py 127.0.0.1  5806 60 &
+
+pkill server 
+sleep 1
+pkill client
+sleep 1
+pkill skrou
+sleep 1
+
+TEST=../../../tools/run_test.py
+
+${TEST} --test "connection_rate"
+
+
+

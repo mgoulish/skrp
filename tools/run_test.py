@@ -59,11 +59,17 @@ SENDER_THREADS = args.sender_threads
 # The test name causes specific values to be set for some args.
 #----------------------------------------------------------------
 
-post_processor_path = None
+post_processor_path         = None
+server_command              = None
+connection_rate_server_path = None
+connection_rate_client_path = None
+router_template_path        = f"{SKRP_ROOT}/router_templates"
 
 # throughput ----------------------------------------------------
 if TEST == 'throughput' : 
   # You need a big machine to run this.
+  server_command = ["iperf3", "-s", "-p", "5801"]
+  client_command = ["iperf3", "-c", "127.0.0.1", "-p", "5800" ]
   post_processor_path = f"{SKRP_ROOT}/tests/throughput/2_routers/process_results.py"
   ROUTER_THREADS = ['1', '2', '4', '5', '10']
   SENDER_THREADS = ['1', '2', '4', '5', '10']
@@ -72,6 +78,8 @@ if TEST == 'throughput' :
   CPU_LIMITS     = ['500', '400', '300', '200', '100', '50']
 # short_throughput ----------------------------------------------
 elif TEST == 'short_throughput' :
+  server_command = ["iperf3", "-s", "-p", "5801"]
+  client_command = ["iperf3", "-c", "127.0.0.1", "-p", "5800" ]
   post_processor_path = f"{SKRP_ROOT}/tests/throughput/2_routers/process_results.py"
   ROUTER_THREADS = ['1', '2', '4']
   SENDER_THREADS = ['1', '2', '4']
@@ -80,6 +88,8 @@ elif TEST == 'short_throughput' :
   CPU_LIMITS     = ['200', '100', '50']
 # soak       ----------------------------------------------------
 elif TEST == 'soak' :   
+  server_command = ["iperf3", "-s", "-p", "5801"]
+  client_command = ["iperf3", "-c", "127.0.0.1", "-p", "5800" ]
   post_processor_path = f"{SKRP_ROOT}/tests/soak/2_routers/process_results.py"
   ROUTER_THREADS = ['5']
   SENDER_THREADS = ['5']
@@ -88,10 +98,25 @@ elif TEST == 'soak' :
   CPU_LIMITS     = ['500']
 # short_soak ----------------------------------------------------
 elif TEST == 'short_soak' :
+  server_command = ["iperf3", "-s", "-p", "5801"]
+  client_command = ["iperf3", "-c", "127.0.0.1", "-p", "5800" ]
   post_processor_path = f"{SKRP_ROOT}/tests/soak/2_routers/process_results.py"
   ROUTER_THREADS = ['5']
   SENDER_THREADS = ['5']
   DURATION       =  100
+  ITERATIONS     = ['1']
+  CPU_LIMITS     = ['500']
+# connection_rate ----------------------------------------------------
+elif TEST == 'connection_rate' :
+  cr_root = f"{SKRP_ROOT}/tests/connection_rate/2_routers"
+  connection_rate_server_path = f"{cr_root}/server.py"
+  connection_rate_client_path = f"{cr_root}/client.py"
+  post_processor_path         = f"{cr_root}/process_results.py"
+  server_command = [ connection_rate_server_path, "5806"]
+  client_command = [ connection_rate_client_path, "127.0.0.1", "5806", "60" ]
+  ROUTER_THREADS = ['1']   # not used
+  SENDER_THREADS = ['1']   # not used
+  DURATION       =  60     # not used
   ITERATIONS     = ['1']
   CPU_LIMITS     = ['500']
 else :
@@ -151,14 +176,14 @@ test_count = 0
 
 for RT in ROUTER_THREADS:
     # Create the router config files
-    with open("A.conf.template", "r") as f:
+    with open(f"{router_template_path}/A.conf.template", "r") as f:
         content = f.read()
-    with open("A.conf", "w") as f:
+    with open("./A.conf", "w") as f:
         f.write(content.replace("N_THREADS", RT))
     
-    with open("B.conf.template", "r") as f:
+    with open(f"{router_template_path}/B.conf.template", "r") as f:
         content = f.read()
-    with open("B.conf", "w") as f:
+    with open("./B.conf", "w") as f:
         f.write(content.replace("N_THREADS", RT))
 
     for CPU in CPU_LIMITS:
@@ -201,8 +226,8 @@ for RT in ROUTER_THREADS:
         time.sleep(10)
         
         # Start the server. This is only done once.
-        proc_server = subprocess.Popen(["iperf3", "-s", "-p", "5801"])
-        print("server started")
+        print ( f"Starting server with command: {' '.join(server_command)}" )
+        server_proc = subprocess.Popen ( server_command )
         
         for ST in SENDER_THREADS:
             time.sleep(1)
@@ -214,10 +239,7 @@ for RT in ROUTER_THREADS:
                 print ( f"Result path is {result_path}" )
             
                 # Make the command we will use to run the client.
-                cmd_client = [
-                    "iperf3", "-c", "127.0.0.1", "-p", "5800",
-                    "-P", ST, "-t", str(DURATION)
-                ]
+                client_command.extend ( ["-P", ST, "-t", str(DURATION) ] )
                 # For the client use Popen, because then we can wait 
                 # for the process to complete.
                 # Maybe the process will complete because it has finished
@@ -225,17 +247,19 @@ for RT in ROUTER_THREADS:
                 # Or maybe it is running indefinitely (in a soak test), and
                 # the user just killed it. Works either way.
                 result_file  = open(result_path, "w")
-                iperf_client = subprocess.Popen(cmd_client, stdout=result_file)
+                print ( f"Starting client with command: {' '.join(client_command)}" )
+                client_proc = subprocess.Popen(client_command, stdout=result_file)
 
                 if DURATION == 0 :
-                  print(f"\n\niperf3 client running indefinitely. PID: {iperf_client.pid}")
-                  print(f"Kill the process (e.g., via 'kill {iperf_client.pid}') when ready.\n\n")
+                  # This is a soak test.
+                  print(f"\n\niperf3 client running indefinitely. PID: {client_proc.pid}")
+                  print(f"Kill the process (e.g., via 'kill {client_proc.pid}') when ready.\n\n")
                   time.sleep(5)
 
 
                 # Wait for the iperf server to close.
-                iperf_client.wait()
-                print ( "\n\nThe iperf client has terminated.\n\n" )
+                client_proc.wait()
+                print ( "\n\nThe client has terminated.\n\n" )
                 result_file.close()
 
                 print(" ")
@@ -245,9 +269,9 @@ for RT in ROUTER_THREADS:
         
         time.sleep(5)
         print(" ")
-        print(f"killing server at PID {proc_server.pid}")
-        proc_server.kill()
-        proc_server.wait()
+        print(f"killing server at PID {server_proc.pid}")
+        server_proc.kill()
+        server_proc.wait()
         print ( "Done killing server." )
 
         print("Killing routers...")
