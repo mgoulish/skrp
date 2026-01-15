@@ -4,6 +4,8 @@
 import sys
 import subprocess
 import os
+from collections import defaultdict
+
 
 if len(sys.argv) < 4:
     print("Usage: python process_results.py <client_log_file> [<output_dir>]")
@@ -22,29 +24,33 @@ GRAPH_DIR         = f"{RESULTS_ROOT}/graphs"
 #-------------------------------------------------------------
 # Process throughput results file
 #-------------------------------------------------------------
-print ( f"looking for result in {TEST_RESULTS_DIR}" )
+print ( f"looking for result files in {TEST_RESULTS_DIR}" )
 
-# There should only be one file.
-file_name        = os.listdir ( TEST_RESULTS_DIR ) [ 0 ]
-input_file_path  = f"{TEST_RESULTS_DIR}/{file_name}"
-print ( "found input file : ", input_file_path )
-data_file_path = f"{GRAPH_DIR}/{file_name}.data"
-print ( "data_file_path: ", data_file_path )
-
-
-# Parse the log file (skip header, read CSV lines)
+# Parse the log files (skip header, read CSV lines)
+file_names       = os.listdir ( TEST_RESULTS_DIR )
 data = []
-with open(input_file_path, 'r') as f:
+for file_name in file_names :
+  input_file_path  = f"{TEST_RESULTS_DIR}/{file_name}"
+  print ( f"processing file {input_file_path}" )
+  with open(input_file_path, 'r') as f:
     lines = f.readlines()
     for line in lines[1:]:  # Skip "second,connections" header
-        if line.strip():
-            sec, cnt = line.strip().split(',')
-            data.append((int(sec), int(cnt)))
+      if line.strip():
+        sec, cnt = line.strip().split(',')
+        data.append((int(sec), int(cnt)))
+
+sums = defaultdict(int)
+for second, count in data:
+    sums[second] += count
+
+
 
 # Write data.dat
+data_file_path = f"{GRAPH_DIR}/{file_name}.data"
+sorted_data = sorted(data, key=lambda x: x[0])
 with open(data_file_path, 'w') as f:
-    for sec, cnt in data:
-        f.write(f"{sec} {cnt}\n")
+    for second in sorted(sums) :
+        f.write(f"{second} {sums[second]}\n")
 
 # Create plot.gp
 gnuplot_file_path = f"{GRAPH_DIR}/{file_name}.gplot"
@@ -58,7 +64,7 @@ with open ( gnuplot_file_path, "w" ) as gplot_file :
   gplot_file.write ( f'set xlabel "Time (seconds)" font ",24"\n' )
   gplot_file.write ( f'set ylabel "Connections per second" font ",24"\n' )
   gplot_file.write ( f'set yrange [0:]\n' )
-  gplot_file.write ( f'set terminal jpeg size 2000, 500\n' )
+  gplot_file.write ( f'set terminal jpeg size 2000, 1000\n' )
   gplot_file.write ( f'set output "{image_file_path}"\n' )
   gplot_file.write ( f'plot "{data_file_path}"  with linespoints lt rgb "red" lw 3\n' )
 
